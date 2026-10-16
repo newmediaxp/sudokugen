@@ -23,4 +23,6 @@ implementation, produced it. Grids are puzzle codes (one character per square, `
 | `shuffle.json` | `input`, `seed`, `puzzle`, `solution`                   | solve `input`, shuffle the result with `seed`, and get exactly this `puzzle` and `solution`. |
 | `solve.json`   | `input`, `solution`                                     | solve `input` to `solution`, or fail when `solution` is `null`.               |
 
-Used by: the JS library's `test/spec.test.ts`. The C# tests don't load it yet.
+Used by: the C# tests ([SpecDataTests.cs](../csharp/NMX.SudokuGen.Tests/Core/SpecDataTests.cs))
+and the JS tests ([spec.test.ts](../js/nmx.sudokugen.library/test/spec.test.ts)).
+A change that alters seeded output fails both, so it is a spec change for every language.

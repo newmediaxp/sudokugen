@@ -22,4 +22,9 @@
     <ProjectReference Include="..\NMX.SudokuGen.Library\NMX.SudokuGen.Library.csproj" />
   </ItemGroup>
 
+  <!-- the shared test data every language's tests load, see Core\SpecDataTests.cs -->
+  <ItemGroup>
+    <None Include="..\..\spec\tests\*.json" LinkBase="spec\tests" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

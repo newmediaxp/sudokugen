@@ -15,6 +15,8 @@
 
 A library written in C# to generate and solve sudoku puzzles.
 
+A seed gives the same puzzle as the [JS library](https://www.npmjs.com/package/nmx.sudokugen.library) does for that seed.
+
 ---
 
 ## API
@@ -97,7 +99,11 @@ Also exposes general array/bit helpers used internally — `Copy`, `Same`, `Coun
 * Used in
 
     * Sudoku Gen CLI [(link)](../NMX.SudokuGen.Cli)
-    * Shaolin Sudou [(link)](https://www.newmediaxp.com/blog/article/shaolin-sudoku)
+    * Shaolin Sudoku [(link)](https://www.newmediaxp.com/blog/article/shaolin-sudoku)
+
+* Other languages
+
+    * JS library: [nmx.sudokugen.library](https://www.npmjs.com/package/nmx.sudokugen.library)
 
 * Downloads
 
