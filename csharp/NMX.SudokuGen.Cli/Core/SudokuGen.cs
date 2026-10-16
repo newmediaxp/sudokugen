@@ -8,13 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 public static class SudokuGen
 {
     private const int dftRank = 3, dftTimes = 1;
-    private const string appName = nameof(SudokuGen), version = "1.0.0",
+    private const string appName = nameof(SudokuGen),
         cmdVersion1 = "version", cmdVersion2 = "--version", cmdVersion3 = "-v",
         cmdHelp1 = "help", cmdHelp2 = "--help", cmdHelp3 = "-h",
         cmdCreate = "create", cmdSolve = "solve", cmdShuffle = "shuffle",
@@ -24,6 +25,10 @@ public static class SudokuGen
         expRank = "4", expBlanks = "120", expTimes = "10", expSeed = "777",
         expInput = "./inputs.txt", expOutput = "./outputs.txt",
         expPuzz = "390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300";
+
+    // the csproj <Version>, minus the "+commit" suffix the SDK appends
+    private static readonly string version = typeof(SudokuGen).Assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "unknown";
 
     private const string
         helpInfo = $$"""
