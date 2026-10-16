@@ -1,6 +1,6 @@
 # Sudoku Gen
 
-`sudoku` `csharp` `dotnet` `library` `cli`
+`sudoku` `csharp` `dotnet` `javascript` `typescript` `library` `cli`
 
 &copy; 2024-2026 New Media XP. Licensed under the [MIT License](./LICENSE).  
 |
@@ -16,11 +16,11 @@
 Sudoku Gen creates and solves sudoku puzzles, from rank 2 (4×4) up to rank 5 (25×25).
 
 * Every created puzzle has exactly one solution.
-* A seed reproduces the same puzzle.
+* A seed reproduces the same puzzle, in every language.
 * It can also check a board for conflicts and shuffle a puzzle into an equivalent one.
 
-It comes as a library and as a command-line app. Versions in other languages are planned,
-and they will follow the shared [spec](./spec).
+It comes as a C# library and command-line app, and as a JS library. Versions in more languages are planned,
+and they all follow the shared [spec](./spec).
 
 ---
 
@@ -32,6 +32,9 @@ and they will follow the shared [spec](./spec).
     * [NMX.SudokuGen.Cli](./csharp/NMX.SudokuGen.Cli) — the C# CLI app (`.NET 10`),
       with binaries on [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
     * [NMX.SudokuGen.Tests](./csharp/NMX.SudokuGen.Tests) — the xUnit tests for the C# library
+* [js](./js) — the JS packages, in one npm workspace
+    * [nmx.sudokugen.library](./js/nmx.sudokugen.library) — the JS library (TypeScript, ES modules),
+      published on [npm](https://www.npmjs.com/package/nmx.sudokugen.library)
 * [spec](./spec) — the shared spec every language follows: library API, puzzle code format,
   CLI and test data (in progress)
 
@@ -65,6 +68,24 @@ SudokuGen solve 390560027.001809405.600172893.180257900.500643000.204081570.0030
 
 The [library README](./csharp/NMX.SudokuGen.Library) has the full API,
 and the [CLI README](./csharp/NMX.SudokuGen.Cli) has every command and flag.
+
+### js
+
+Library: install it from npm.
+
+```
+npm install nmx.sudokugen.library
+```
+
+```js
+import { Sudoku, getPuzzleCode } from "nmx.sudokugen.library";
+
+const a_sudoku = Sudoku.create(3, 40, { seed: 777 }); // the same puzzle as the C# example above
+const a_code   = getPuzzleCode(a_sudoku.puzzle);
+const a_solved = Sudoku.solve(a_sudoku.puzzle);       // throws unless the puzzle has exactly one solution
+```
+
+The [library README](./js/nmx.sudokugen.library) has the full API.
 
 ---
 

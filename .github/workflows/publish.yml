@@ -3,9 +3,13 @@ name: publish
 # On a published GitHub Release whose tag starts with csharp-v (e.g. csharp-v1.2.0):
 #  - publishes NMX.SudokuGen.Library to NuGet.org (Trusted Publishing / OIDC, no stored key)
 #  - builds Native AOT executables of the CLI for each platform and attaches them to the release
-# Releases of the other languages share this repo, so every job checks the tag prefix.
-# Bump <Version> in the csprojs and commit before creating the release.
-# NuGet's trusted publishing policy names this file: update the policy before renaming it.
+#  Bump <Version> in the csprojs and commit before creating the release.
+# On a published GitHub Release whose tag starts with js-v (e.g. js-v1.2.0):
+#  - publishes nmx.sudokugen.library to npm (Trusted Publishing / OIDC, with provenance)
+#  Bump "version" in js/nmx.sudokugen.library/package.json and commit before creating the release.
+# The languages share this repo, so every job checks the tag prefix. A manual run (workflow_dispatch)
+# runs every job; the registries skip versions they already have.
+# NuGet's and npm's trusted publishing settings name this file: update them before renaming it.
 on:
   release:
     types: [published]
@@ -46,6 +50,37 @@ jobs:
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
+
+  publish-npm:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'js-v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required: lets npm request the OIDC token for trusted publishing and provenance
+      contents: read
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: js/.node-version
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      - name: Check
+        run: npm run check
+
+      - name: Publish to npm
+        # skips a version npm already has, like NuGet's --skip-duplicate; npm publish runs prepack, which builds
+        run: |
+          name=$(node -p "require('./nmx.sudokugen.library/package.json').name")
+          version=$(node -p "require('./nmx.sudokugen.library/package.json').version")
+          if npm view "$name@$version" version > /dev/null 2>&1; then echo "$name@$version is already on npm"; exit 0; fi
+          npm publish --workspace nmx.sudokugen.library
 
   console-binaries:
     name: aot ${{ matrix.rid }}

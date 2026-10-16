@@ -1,0 +1,26 @@
+{
+    "name": "sudokugen-js",
+    "private": true,
+    "description": "npm workspace holding the JS packages of Sudoku Gen",
+    "license": "MIT",
+    "type": "module",
+    "workspaces": [
+        "nmx.sudokugen.library"
+    ],
+    "engines": {
+        "node": ">=22.18"
+    },
+    "scripts": {
+        "build": "npm run build --workspaces",
+        "typecheck": "npm run typecheck --workspaces",
+        "test": "npm test --workspaces",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "check": "npm run format:check && npm run typecheck && npm test"
+    },
+    "devDependencies": {
+        "@types/node": "^24.19.2",
+        "prettier": "^3.9.10",
+        "typescript": "^7.0.2"
+    }
+}

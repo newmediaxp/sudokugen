@@ -1,0 +1,45 @@
+{
+    "name": "nmx.sudokugen.library",
+    "version": "1.1.0",
+    "description": "Sudoku generator and solver: unique-solution puzzle creation (optionally seeded), solving, validation, conflict reporting and isomorphic shuffling.",
+    "keywords": [
+        "sudoku",
+        "puzzle",
+        "solver",
+        "generator"
+    ],
+    "homepage": "https://github.com/newmediaxp/sudokugen/tree/main/js/nmx.sudokugen.library#readme",
+    "bugs": {
+        "url": "https://github.com/newmediaxp/sudokugen/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/newmediaxp/sudokugen.git",
+        "directory": "js/nmx.sudokugen.library"
+    },
+    "license": "MIT",
+    "author": "New Media XP <contact@newmediaxp.com> (https://www.newmediaxp.com)",
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "engines": {
+        "node": ">=20"
+    },
+    "scripts": {
+        "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+        "build": "npm run clean && tsc -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "test": "node --test \"test/**/*.test.ts\"",
+        "prepack": "npm run build && node -e \"require('node:fs').copyFileSync('../../LICENSE', 'LICENSE')\""
+    }
+}

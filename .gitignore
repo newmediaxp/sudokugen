@@ -428,6 +428,11 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# JS packages: build output, packed tarballs, and the LICENSE copy that prepack adds
+js/*/dist/
+js/*/LICENSE
+*.tgz
+
 # AI assistant artifacts
 .claude/
 CLAUDE.md

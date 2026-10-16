@@ -1,0 +1,3 @@
+dist/
+# the READMEs follow the house markdown style (* bullets, --- rules), which prettier would rewrite
+*.md
