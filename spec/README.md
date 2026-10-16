@@ -2,9 +2,11 @@
 
 The shared spec every language implementation follows. Not written yet.
 
-It will hold:
+This file will hold the whole written spec:
 
 * the library API
 * the puzzle code format
 * the `sudokugen` CLI commands, flags and output
-* test puzzles every language must reproduce
+
+The `tests/` folder will hold the test data every language's tests load:
+seeds, puzzles and the expected results.
