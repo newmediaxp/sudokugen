@@ -45,9 +45,12 @@ How the Sudoku Gen packages get published. This is for maintainers; the package 
 * Version: `version` in [js/nmx.sudokugen.library/package.json](./js/nmx.sudokugen.library/package.json).
 * Job: `publish-npm` runs `npm run check` in `js/`, then publishes the library to
   [npm](https://www.npmjs.com/package/nmx.sudokugen.library) with provenance.
-* Once, before the first release: npm can't trust a workflow for a package that doesn't exist yet, so publish
-  the first version by hand from `js/nmx.sudokugen.library` (`npm login`, then `npm publish`). Then, in the
-  package's settings on npmjs.com, add a trusted publisher: user `newmediaxp`, repository `sudokugen`,
-  workflow `publish.yml`.
+* First version: npm can't trust a workflow for a package that doesn't exist yet, so publish it by hand
+  from `js/nmx.sudokugen.library` (`npm login`, then `npm publish`).
+* First release through CI: on the same day, add a trusted publisher in the package's settings on npmjs.com
+  (organization or user `newmediaxp`, repository `sudokugen`, workflow filename `publish.yml`, the rest blank).
+  npm deletes a new trusted publisher setting that no publish has used within 2 days, so don't add it earlier.
+  Once that run has published, set the package's Publishing access to "Require two-factor authentication
+  and disallow tokens", so only CI can publish.
 
 ---
