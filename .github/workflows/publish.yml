@@ -1,9 +1,11 @@
 name: publish
 
-# On a published GitHub Release:
+# On a published GitHub Release whose tag starts with csharp-v (e.g. csharp-v1.2.0):
 #  - publishes NMX.SudokuGen.Library to NuGet.org (Trusted Publishing / OIDC, no stored key)
-#  - builds Native AOT executables of the console for each platform and attaches them to the release
+#  - builds Native AOT executables of the CLI for each platform and attaches them to the release
+# Releases of the other languages share this repo, so every job checks the tag prefix.
 # Bump <Version> in the csprojs and commit before creating the release.
+# NuGet's trusted publishing policy names this file: update the policy before renaming it.
 on:
   release:
     types: [published]
@@ -11,6 +13,7 @@ on:
 
 jobs:
   publish-nuget:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'csharp-v')
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # required: lets the job request the OIDC token for trusted publishing
@@ -23,13 +26,13 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore csharp/NMX.SudokuGen.Library.sln
 
       - name: Test
-        run: dotnet test -c Release --no-restore
+        run: dotnet test csharp/NMX.SudokuGen.Library.sln -c Release --no-restore
 
       - name: Pack
-        run: dotnet pack NMX.SudokuGen.Library -c Release -o ./artifacts
+        run: dotnet pack csharp/NMX.SudokuGen.Library -c Release -o ./artifacts
 
       - name: NuGet trusted-publishing login
         id: login
@@ -46,6 +49,7 @@ jobs:
 
   console-binaries:
     name: aot ${{ matrix.rid }}
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'csharp-v')
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write   # required to upload assets to the release
@@ -72,7 +76,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
       - name: Publish Native AOT
-        run: dotnet publish NMX.SudokuGen.Console -c Release -r ${{ matrix.rid }} -o publish
+        run: dotnet publish csharp/NMX.SudokuGen.Cli -c Release -r ${{ matrix.rid }} -o publish
 
       - name: Stage binary
         shell: bash

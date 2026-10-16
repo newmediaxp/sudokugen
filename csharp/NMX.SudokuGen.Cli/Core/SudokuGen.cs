@@ -1,6 +1,6 @@
 // Copyright (c) 2024-2026 New Media XP. Licensed under the MIT License.
 
-namespace NMX.SudokuGen.Console.Core;
+namespace NMX.SudokuGen.Cli.Core;
 
 using Library.Core;
 using CLAP;

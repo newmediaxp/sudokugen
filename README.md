@@ -13,9 +13,11 @@
 
 ## Contents
 
-* NMX.SudokuGen.Library [(link)](./NMX.SudokuGen.Library) — `netstandard2.1` library
-* NMX.SudokuGen.Console [(link)](./NMX.SudokuGen.Console) — `.NET 10` CLI app
-* NMX.SudokuGen.Tests [(link)](./NMX.SudokuGen.Tests) — xUnit test suite
+* spec [(link)](./spec) — shared spec every language follows
+* C# [(link)](./csharp) — `NMX.SudokuGen.Library.sln`
+    * NMX.SudokuGen.Library [(link)](./csharp/NMX.SudokuGen.Library) — `netstandard2.1` library
+    * NMX.SudokuGen.Cli [(link)](./csharp/NMX.SudokuGen.Cli) — `.NET 10` CLI app
+    * NMX.SudokuGen.Tests [(link)](./csharp/NMX.SudokuGen.Tests) — xUnit test suite
 
 ---
 

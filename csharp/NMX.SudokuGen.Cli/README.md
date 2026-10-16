@@ -1,8 +1,8 @@
-# Sudoku Gen Console
+# Sudoku Gen CLI
 
 `sudoku` `C#` `app` `cli`
 
-&copy; 2024-2026 New Media XP. Licensed under the [MIT License](../LICENSE).  
+&copy; 2024-2026 New Media XP. Licensed under the [MIT License](../../LICENSE).  
 |
 [website](https://www.newmediaxp.com)
 |

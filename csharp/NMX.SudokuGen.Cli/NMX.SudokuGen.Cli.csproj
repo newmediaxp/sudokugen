@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <PublishTrimmed>True</PublishTrimmed>
-    <Title>SudokuGen Console</Title>
+    <Title>SudokuGen CLI</Title>
     <PublishAot>true</PublishAot>
     <Version>1.1.0</Version>
     <Description>CLI front-end for the SudokuGen library: create and solve sudoku puzzles from the command line.</Description>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE">
+    <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

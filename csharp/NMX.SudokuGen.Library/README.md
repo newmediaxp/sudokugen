@@ -2,7 +2,7 @@
 
 `sudoku` `C#` `library` `dll`
 
-&copy; 2024-2026 New Media XP. Licensed under the [MIT License](../LICENSE).  
+&copy; 2024-2026 New Media XP. Licensed under the [MIT License](../../LICENSE).  
 |
 [website](https://www.newmediaxp.com)
 |
@@ -96,7 +96,7 @@ Also exposes general array/bit helpers used internally — `Copy`, `Same`, `Coun
 
 * Used in
 
-    * Sudoku Gen Console [(link)](../NMX.SudokuGen.Console)
+    * Sudoku Gen CLI [(link)](../NMX.SudokuGen.Cli)
     * Shaolin Sudou [(link)](https://www.newmediaxp.com/blog/article/shaolin-sudoku)
 
 * Downloads
