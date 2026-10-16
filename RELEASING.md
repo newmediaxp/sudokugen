@@ -83,7 +83,5 @@ Every package's version is `major.minor.patch`.
     * Environment name: empty, since the job uses no GitHub environment. The label is optional.
     * Allowed actions: tick "Allow npm publish". Without it npm only lets the workflow stage a release for
       approval on the website, and the job's plain `npm publish` is refused. Leave "Allow npm dist-tag" unticked.
-* Publishing access, in the package's settings: "Require two-factor authentication and disallow bypass 2fa
-  tokens". Trusted publishing keeps working with it, and publishing by hand still works with 2FA.
 
 ---
