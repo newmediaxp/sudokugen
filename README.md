@@ -29,8 +29,9 @@ and they all follow the shared [spec](./spec).
 * [csharp](./csharp) — the C# library and CLI app, in one Visual Studio solution
     * [NMX.SudokuGen.Library](./csharp/NMX.SudokuGen.Library) — the C# library (`netstandard2.1`),
       published on [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library)
-    * [NMX.SudokuGen.Cli](./csharp/NMX.SudokuGen.Cli) — the C# CLI app (`.NET 10`),
-      with binaries on [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
+    * [NMX.SudokuGen.Cli](./csharp/NMX.SudokuGen.Cli) — the C# CLI app (`.NET 10`), published on
+      [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli) as the .NET tool `sudokugen`,
+      with standalone binaries on [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
     * [NMX.SudokuGen.Tests](./csharp/NMX.SudokuGen.Tests) — the xUnit tests for the C# library
 * [js](./js) — the JS packages, in one npm workspace
     * [nmx.sudokugen.library](./js/nmx.sudokugen.library) — the JS library (TypeScript, ES modules),
@@ -58,12 +59,16 @@ string a_code   = Utility.GetPuzzleCode(a_sudoku.Puzzle);
 Sudoku a_solved = Sudoku.Solve(a_sudoku.Puzzle);   // throws unless the puzzle has exactly one solution
 ```
 
-CLI: download `SudokuGen-<platform>` from [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases).
-The examples call it `SudokuGen`.
+CLI: install it as a .NET tool from NuGet, or download a standalone `SudokuGen-<platform>` binary
+from [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases).
 
 ```
-SudokuGen create -r 3 -b 40 -s 777
-SudokuGen solve 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300
+dotnet tool install -g NMX.SudokuGen.Cli
+```
+
+```
+sudokugen create -r 3 -b 40 -s 777
+sudokugen solve 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300
 ```
 
 The [library README](./csharp/NMX.SudokuGen.Library) has the full API,

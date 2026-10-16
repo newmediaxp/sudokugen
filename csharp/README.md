@@ -4,8 +4,9 @@ The C# projects of Sudoku Gen, in one Visual Studio solution ([NMX.SudokuGen.Lib
 
 * [NMX.SudokuGen.Library](./NMX.SudokuGen.Library) — the C# library (`netstandard2.1`), published on
   [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library)
-* [NMX.SudokuGen.Cli](./NMX.SudokuGen.Cli) — the C# CLI app (`.NET 10`), with Native AOT binaries on
-  [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
+* [NMX.SudokuGen.Cli](./NMX.SudokuGen.Cli) — the C# CLI app (`.NET 10`), published on
+  [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli) as the .NET tool `sudokugen`, with Native AOT
+  binaries also on [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
 * [NMX.SudokuGen.Tests](./NMX.SudokuGen.Tests) — the xUnit tests for the library
 * [NMX.SudokuGen.SpecData](./NMX.SudokuGen.SpecData) — a dev tool that writes the shared test data in
   [spec/tests](../spec/tests) from the library; never packed or published
@@ -19,6 +20,7 @@ Needs the .NET 10 SDK. Native AOT builds of the CLI also need the platform's C++
 ```
 dotnet test NMX.SudokuGen.Library.sln                    # build and run the tests
 dotnet publish NMX.SudokuGen.Cli -c Release -r win-x64   # Native AOT CLI binary for one platform
+dotnet pack NMX.SudokuGen.Cli -c Release -r win-x64      # the CLI's tool package for one platform
 dotnet run --project NMX.SudokuGen.SpecData              # rewrite spec/tests from the library
 ```
 

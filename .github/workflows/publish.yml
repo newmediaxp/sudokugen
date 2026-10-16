@@ -3,6 +3,8 @@ name: publish
 # On a published GitHub Release whose tag starts with csharp-v (e.g. csharp-v1.2.0):
 #  - publishes NMX.SudokuGen.Library to NuGet.org (Trusted Publishing / OIDC, no stored key)
 #  - builds Native AOT executables of the CLI for each platform and attaches them to the release
+#  - publishes the CLI to NuGet.org as the .NET tool NMX.SudokuGen.Cli (command sudokugen):
+#    one Native AOT package per platform, a framework-dependent fallback and the pointer package
 #  Bump <Version> in the csprojs and commit before creating the release.
 # On a published GitHub Release whose tag starts with js-v (e.g. js-v1.2.0):
 #  - publishes nmx.sudokugen.library to npm (Trusted Publishing / OIDC, with provenance)
@@ -83,8 +85,8 @@ jobs:
           if npm view "$name@$version" version > /dev/null 2>&1; then echo "$name@$version is already on npm"; exit 0; fi
           npm publish --workspace nmx.sudokugen.library
 
-  console-binaries:
-    name: aot ${{ matrix.rid }}
+  cli-aot:
+    name: cli ${{ matrix.rid }}
     if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'csharp-v')
     runs-on: ${{ matrix.os }}
     permissions:
@@ -114,6 +116,10 @@ jobs:
       - name: Publish Native AOT
         run: dotnet publish csharp/NMX.SudokuGen.Cli -c Release -r ${{ matrix.rid }} -o publish
 
+      # Native AOT only compiles on the target's OS, so each platform's tool package is packed here
+      - name: Pack the tool package
+        run: dotnet pack csharp/NMX.SudokuGen.Cli -c Release -r ${{ matrix.rid }} -o packages
+
       - name: Stage binary
         shell: bash
         run: |
@@ -126,9 +132,61 @@ jobs:
           name: SudokuGen-${{ matrix.rid }}
           path: dist/*
 
+      - name: Upload the tool package
+        uses: actions/upload-artifact@v7
+        with:
+          name: tool-${{ matrix.rid }}
+          path: packages/NMX.SudokuGen.Cli.${{ matrix.rid }}.*.nupkg
+          if-no-files-found: error
+
       - name: Attach to release
         if: github.event_name == 'release'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
+
+  publish-cli-tool:
+    # runs only when every platform's package built, so NuGet never gets a partial set
+    needs: cli-aot
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'csharp-v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required: lets the job request the OIDC token for trusted publishing
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download the platform packages
+        uses: actions/download-artifact@v8
+        with:
+          pattern: tool-*
+          path: packages
+          merge-multiple: true
+
+      # any: the framework-dependent fallback for platforms without a Native AOT package;
+      # the plain pack makes the pointer package that lists every platform package
+      - name: Pack the fallback and pointer packages
+        run: |
+          dotnet pack csharp/NMX.SudokuGen.Cli -c Release -r any -p:PublishAot=false -p:PublishTrimmed=false -o packages
+          dotnet pack csharp/NMX.SudokuGen.Cli -c Release -o packages
+
+      - name: NuGet trusted-publishing login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: NewMediaXP
+
+      # the platform packages (ids end in a RID) go first, the pointer (id then version) last,
+      # so the pointer never goes live before the packages it lists
+      - name: Push to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          for f in packages/NMX.SudokuGen.Cli.[a-z]*.nupkg packages/NMX.SudokuGen.Cli.[0-9]*.nupkg; do
+            dotnet nuget push "$f" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done

@@ -2,7 +2,7 @@
 
 `sudoku` `C#` `app` `cli`
 
-&copy; 2024-2026 New Media XP. Licensed under the [MIT License](../../LICENSE).  
+&copy; 2024-2026 New Media XP. Licensed under the [MIT License](https://github.com/newmediaxp/sudokugen/blob/main/LICENSE).  
 |
 [website](https://www.newmediaxp.com)
 |
@@ -14,6 +14,22 @@
 ## Description
 
 A CLI application written in C# that can generate and solve sudoku puzzles.
+
+---
+
+## Install
+
+As a .NET tool, from [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli). It needs the .NET 10 SDK, and installs
+a Native AOT binary on Windows (x64, x86, arm64), Linux and macOS (x64, arm64), or a portable build anywhere else.
+
+```
+dotnet tool install -g NMX.SudokuGen.Cli
+```
+
+Then run it as `sudokugen`. To run it once without installing, use `dnx NMX.SudokuGen.Cli` in place of `sudokugen`.
+
+Or download a standalone binary, `SudokuGen-<platform>`, from [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases).
+It needs nothing else installed.
 
 ---
 
@@ -56,13 +72,13 @@ A bare launch with no arguments prints the usage info.
 ### Examples
 
 ```
-SudokuGen create
-SudokuGen create -r 4 -b 120 -s 777
-SudokuGen create -b max -exact
-SudokuGen create -c 10 -o ./outputs.txt
-SudokuGen solve 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300
-SudokuGen solve -i ./inputs.txt -o ./outputs.txt
-SudokuGen shuffle 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300 -s 777
+sudokugen create
+sudokugen create -r 4 -b 120 -s 777
+sudokugen create -b max -exact
+sudokugen create -c 10 -o ./outputs.txt
+sudokugen solve 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300
+sudokugen solve -i ./inputs.txt -o ./outputs.txt
+sudokugen shuffle 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300 -s 777
 ```
 
 Puzzle code format: one character per square, row by row — `0` = blank,
@@ -78,11 +94,12 @@ Exit code is 0 on success, 1 when any argument or puzzle failed; errors print to
 * Dependencies
 
     * .Net 10.0
-    * Sudoku Gen Library [(link)](../NMX.SudokuGen.Library)
+    * Sudoku Gen Library [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Library)
 
 * Downloads
 
-    * [Github](https://github.com/newmediaxp/sudokugen/releases)
+    * [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli) (.NET tool)
+    * [Github](https://github.com/newmediaxp/sudokugen/releases) (standalone binaries)
 
 ---
 

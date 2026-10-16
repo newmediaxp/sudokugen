@@ -10,12 +10,28 @@
     <Title>SudokuGen CLI</Title>
     <PublishAot>true</PublishAot>
     <Version>1.1.0</Version>
-    <Description>CLI front-end for the SudokuGen library: create and solve sudoku puzzles from the command line.</Description>
+    <PackageId>NMX.SudokuGen.Cli</PackageId>
+    <Description>Sudoku generator and solver for the command line: the sudokugen tool creates, solves and shuffles puzzles. Installs as a Native AOT binary on Windows, Linux and macOS.</Description>
     <Company>New Media XP</Company>
     <Authors>AnimaxNeil</Authors>
     <Copyright>Copyright (c) 2024-2026 New Media XP</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/newmediaxp/sudokugen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/newmediaxp/sudokugen.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>sudoku;puzzle;solver;generator;cli;tool</PackageTags>
+  </PropertyGroup>
+
+  <!-- a .NET tool: one Native AOT package per platform, each packed on its own OS with dotnet pack -r <rid>,
+       a framework-dependent fallback (pack -r any with AOT and trimming off) for every other platform,
+       and a pointer package (plain dotnet pack) that lists them; see RELEASING.md -->
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>sudokugen</ToolCommandName>
+    <ToolPackageRuntimeIdentifiers>win-x64;win-x86;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64;any</ToolPackageRuntimeIdentifiers>
+    <!-- keeps the library's XML docs out of the published app and the tool packages -->
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

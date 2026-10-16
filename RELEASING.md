@@ -35,7 +35,14 @@ How the Sudoku Gen packages get published. This is for maintainers; the package 
     * `publish-nuget` runs the tests, packs the library and pushes it to
       [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library). The trusted publishing policy belongs to
       the NuGet user NewMediaXP.
-    * `console-binaries` builds Native AOT binaries of the CLI for 7 platforms and attaches them to the release.
+    * `cli-aot` builds Native AOT binaries of the CLI for 7 platforms, attaches them to the release, and packs
+      each platform's tool package on that platform (Native AOT can't cross-compile between operating systems).
+    * `publish-cli-tool` runs once all 7 succeed. It packs the framework-dependent `any` fallback and the
+      pointer package, then pushes the CLI to [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli) as the
+      .NET tool `NMX.SudokuGen.Cli`: the platform packages first, the pointer last, so installs never find
+      a missing platform package.
+* Before the first release with the CLI tool: on nuget.org, check that the trusted publishing policy's scope
+  allows new packages and covers `NMX.SudokuGen.Cli`, or the push of the new package id is refused.
 
 ---
 
