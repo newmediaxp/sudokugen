@@ -4,7 +4,9 @@ namespace NMX.SudokuGen.Library.Core;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 public static class Utility
@@ -23,6 +25,24 @@ public static class Utility
 
     public static int Count(in IEnumerable<int> p_arr, in int p_num)
     { int a_count = 0; foreach (int a_value in p_arr) if (a_value == p_num) ++a_count; return a_count; }
+
+    /// <summary>
+    /// The 1.0.0 signature of <see cref="Same(in IEnumerable{int}, in IEnumerable{int})"/>, kept so apps compiled against 1.0.0 keep running.
+    /// The lowered priority makes new calls bind to the <see cref="IEnumerable{T}"/> overload, so C# 13+ callers never see the obsolete warning;
+    /// older compilers ignore the priority and warn on calls with arrays or lists.
+    /// </summary>
+    [Obsolete("Kept only for apps compiled against 1.0.0; calls bind to Same(IEnumerable<int>, IEnumerable<int>). Will be removed in a future major version.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [OverloadResolutionPriority(-1)]
+    public static bool Same(in IReadOnlyList<int> p_arr1, in IReadOnlyList<int> p_arr2) => Same((IEnumerable<int>)p_arr1, p_arr2);
+
+    /// <summary>
+    /// The 1.0.0 signature of <see cref="Count(in IEnumerable{int}, in int)"/>, kept so apps compiled against 1.0.0 keep running.
+    /// </summary>
+    [Obsolete("Kept only for apps compiled against 1.0.0; calls bind to Count(IEnumerable<int>, int). Will be removed in a future major version.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [OverloadResolutionPriority(-1)]
+    public static int Count(in IReadOnlyList<int> p_arr, in int p_num) => Count((IEnumerable<int>)p_arr, p_num);
 
     public static void Swap2(ref int p_num1, ref int p_num2) => (p_num2, p_num1) = (p_num1, p_num2);
 

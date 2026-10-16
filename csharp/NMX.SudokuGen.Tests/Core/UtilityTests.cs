@@ -1,6 +1,8 @@
 // Copyright (c) 2024-2026 New Media XP. Licensed under the MIT License.
 
 namespace NMX.SudokuGen.Tests.Core;
+using System.Reflection;
+using NMX.SudokuGen.Library.Core;
 using static NMX.SudokuGen.Library.Core.Utility;
 
 public sealed class UtilityTests
@@ -41,6 +43,22 @@ public sealed class UtilityTests
     {
         Assert.Equal(3, Count([0, 1, 0, 2, 0], 0));
         Assert.Equal(0, Count([1, 2, 3], 9));
+    }
+
+    // apps compiled against 1.0.0 call these exact signatures (by-ref IReadOnlyList<int>), so they must stay until a major version
+    [Fact]
+    public void SameAndCount_Keep100SignaturesForCompiledApps()
+    {
+        Type a_list = typeof(IReadOnlyList<int>).MakeByRefType(), a_int = typeof(int).MakeByRefType();
+        MethodInfo? a_same = typeof(Utility).GetMethod(nameof(Same), [a_list, a_list]);
+        MethodInfo? a_count = typeof(Utility).GetMethod(nameof(Count), [a_list, a_int]);
+        Assert.NotNull(a_same);
+        Assert.NotNull(a_count);
+        Assert.NotNull(a_same.GetCustomAttribute<ObsoleteAttribute>());
+        Assert.NotNull(a_count.GetCustomAttribute<ObsoleteAttribute>());
+        Assert.True((bool)a_same.Invoke(null, [new[] { 1, 2, 3 }, new[] { 1, 2, 3 }])!);
+        Assert.False((bool)a_same.Invoke(null, [new[] { 1, 2, 3 }, new[] { 1, 2, 3, 4 }])!);
+        Assert.Equal(3, (int)a_count.Invoke(null, [new[] { 0, 1, 0, 2, 0 }, 0])!);
     }
 
     [Fact]
