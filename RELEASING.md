@@ -26,6 +26,18 @@ How the Sudoku Gen packages get published. This is for maintainers; the package 
 
 ---
 
+## Versioning
+
+Every package's version is `major.minor.patch`.
+
+* `major.minor` is the shared spec feature set: packages with the same `major.minor` have the same features
+  and give the same output for the same seed, whatever their language. A spec change bumps it in each
+  language as that language implements the change.
+* `patch` is per language: fixes, packaging and docs that leave the spec alone. So C# 1.1.1 and JS 1.1.0
+  implement the same spec.
+
+---
+
 ## csharp
 
 * Tag: `csharp-v<version>`
