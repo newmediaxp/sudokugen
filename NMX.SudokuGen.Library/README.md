@@ -41,6 +41,7 @@ Immutable puzzle/solution pair. Grids are flat, row-by-row lists of `squares` va
 | `Shuffle`       | `Sudoku Shuffle()`                                                     | Returns an equivalent variant (same rank, difficulty and blank count, different look). The original is untouched. |
 | `Shuffle`       | `Sudoku Shuffle(int seed)`                                            | Seeded shuffle.                                                                                            |
 | `FindConflicts` | `Conflict FindConflicts(int[] board, int index)`                      | Which units the value at `index` repeats in. A blank (`0`) never conflicts.                               |
+| `FindConflicts` | `Conflict FindConflicts(int[] board, int input, int index, bool excludeIndex)` | Which of `index`'s units already hold `input` — test a candidate before placing it. `excludeIndex = true` ignores the square's current value; `false` searches it too. A blank `input` (`0`) never conflicts. |
 
 #### Properties
 

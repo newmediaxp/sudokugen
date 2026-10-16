@@ -30,6 +30,13 @@ public sealed class UtilityTests
     }
 
     [Fact]
+    public void Same_FalseForDifferentLengths()
+    {
+        Assert.False(Same([1, 2, 3], [1, 2, 3, 4]));
+        Assert.False(Same([1, 2, 3, 4], [1, 2, 3]));
+    }
+
+    [Fact]
     public void Count_CountsMatchingElements()
     {
         Assert.Equal(3, Count([0, 1, 0, 2, 0], 0));

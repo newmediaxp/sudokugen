@@ -4,6 +4,7 @@ namespace NMX.SudokuGen.Library.Core;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 public static class Utility
@@ -15,15 +16,17 @@ public static class Utility
     /// <param name="p_to">Destination array; filled completely.</param>
     public static void Copy(in int[] p_from, in int[] p_to) => Array.Copy(p_from, 0, p_to, 0, p_to.Length);
 
-    public static bool Same(in IReadOnlyList<int> p_arr1, in IReadOnlyList<int> p_arr2)
-    { for (int i = 0; i < p_arr1.Count; ++i) if (p_arr1[i] != p_arr2[i]) return false; return true; }
+    /// <summary>
+    /// True when both sequences hold the same values in the same order; sequences of different lengths are never the same.
+    /// </summary>
+    public static bool Same(in IEnumerable<int> p_arr1, in IEnumerable<int> p_arr2) => p_arr1.SequenceEqual(p_arr2);
 
-    public static int Count(in IReadOnlyList<int> p_arr, in int p_num)
-    { int a_count = 0; for (int i = 0; i < p_arr.Count; ++i) if (p_arr[i] == p_num) ++a_count; return a_count; }
+    public static int Count(in IEnumerable<int> p_arr, in int p_num)
+    { int a_count = 0; foreach (int a_value in p_arr) if (a_value == p_num) ++a_count; return a_count; }
 
     public static void Swap2(ref int p_num1, ref int p_num2) => (p_num2, p_num1) = (p_num1, p_num2);
 
-    public static void Init(in int[] p_arr) { for (int i = 0; i < p_arr.Length; ++i) p_arr[i] = 0; }
+    public static void Init(in int[] p_arr) => Array.Clear(p_arr, 0, p_arr.Length);
 
     /// <summary>
     /// Fills an array block-wise so that every consecutive block ends up a random permutation of the same value range.

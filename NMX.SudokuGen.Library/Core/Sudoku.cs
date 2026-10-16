@@ -256,8 +256,8 @@ public sealed class Sudoku
     }
 
     /// <summary>
-    /// Checks the value already placed at <paramref name="p_idx"/> against the rest of <paramref name="p_board"/> and reports every unit where it appears again. 
-    /// A blank square (0) never conflicts. 
+    /// Checks the value already placed at <paramref name="p_idx"/> against the rest of <paramref name="p_board"/> and reports every unit where it appears again.
+    /// A blank square (0) never conflicts.
     /// </summary>
     /// <param name="p_board">The board being played, row by row, 0 = blank;
     /// must have exactly <see cref="squares"/> squares.</param>
@@ -268,54 +268,84 @@ public sealed class Sudoku
     /// at the index is outside 1..<see cref="rows"/>.</exception>
     public Conflict FindConflicts(in int[] p_board, in int p_idx)
     {
-        if (p_board == null || p_board.Length != squares)
-            throw new ArgumentException($"board must have exactly {squares} squares", nameof(p_board));
-        if (p_idx < 0 || p_idx >= squares)
-            throw new ArgumentException($"index must be within 0..{squares - 1}", nameof(p_idx));
+        ValidateBoardAndIndex(p_board, p_idx);
         int a_input = p_board[p_idx];
-        if (a_input == 0) return Conflict.None;
         if (a_input < 0 || a_input > rows)
             throw new ArgumentException($"value {a_input} at index {p_idx} is outside 1..{rows}", nameof(p_board));
+        return FindConflicts(p_board, a_input, p_idx, true);
+    }
+
+    /// <summary>
+    /// Checks <paramref name="p_input"/> against the row, column and segment of the square at <paramref name="p_idx"/> and reports every unit where it already appears,
+    /// so a candidate can be tested before it is written to the board. A blank input (0) never conflicts.
+    /// </summary>
+    /// <param name="p_board">The board being played, row by row, 0 = blank;
+    /// must have exactly <see cref="squares"/> squares.</param>
+    /// <param name="p_input">The value to check; may differ from the value currently at <paramref name="p_idx"/>.</param>
+    /// <param name="p_idx">Index of the square whose units are searched.</param>
+    /// <param name="p_excludeIdx">When <see langword="true"/> the square at <paramref name="p_idx"/> is skipped, so its current value is ignored;
+    /// when <see langword="false"/> it is searched too, so a square already holding <paramref name="p_input"/> reports all three units.</param>
+    /// <returns>Flags for each conflicting unit (row, column, segment), or <see cref="Conflict.None"/>.</returns>
+    /// <exception cref="ArgumentException">The board is null or not exactly
+    /// <see cref="squares"/> long, the index is outside the board, or the input
+    /// is outside 0..<see cref="rows"/>.</exception>
+    public Conflict FindConflicts(in int[] p_board, in int p_input, in int p_idx, in bool p_excludeIdx)
+    {
+        ValidateBoardAndIndex(p_board, p_idx);
+        if (p_input == 0) return Conflict.None;
+        if (p_input < 0 || p_input > rows)
+            throw new ArgumentException($"input {p_input} is outside 1..{rows}", nameof(p_input));
         Conflict a_conflicts = Conflict.None;
-        if (Search_Row(p_board, a_input, p_idx)) a_conflicts |= Conflict.Row;
-        if (Search_Column(p_board, a_input, p_idx)) a_conflicts |= Conflict.Column;
-        if (Search_Segment(p_board, a_input, p_idx)) a_conflicts |= Conflict.Segment;
+        if (Search_Row(p_board, p_input, p_idx, p_excludeIdx)) a_conflicts |= Conflict.Row;
+        if (Search_Column(p_board, p_input, p_idx, p_excludeIdx)) a_conflicts |= Conflict.Column;
+        if (Search_Segment(p_board, p_input, p_idx, p_excludeIdx)) a_conflicts |= Conflict.Segment;
         return a_conflicts;
     }
 
     /// <summary>
-    /// True when <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s row (<paramref name="p_idx"/> itself excluded).
-    /// Serves <see cref="FindConflicts"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.
+    /// Throws unless <paramref name="p_board"/> has exactly <see cref="squares"/> squares and <paramref name="p_idx"/> lies on it.
     /// </summary>
-    private bool Search_Row(in int[] p_arr, in int p_input, in int p_idx)
+    private void ValidateBoardAndIndex(in int[] p_board, in int p_idx)
+    {
+        if (p_board == null || p_board.Length != squares)
+            throw new ArgumentException($"board must have exactly {squares} squares", nameof(p_board));
+        if (p_idx < 0 || p_idx >= squares)
+            throw new ArgumentException($"index must be within 0..{squares - 1}", nameof(p_idx));
+    }
+
+    /// <summary>
+    /// Whether <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s row (<paramref name="p_idx"/> itself excluded if <paramref name="p_excludeIdx"/> is <see langword="true"/>).
+    /// Serves <see cref="FindConflicts(in int[], in int, in int, in bool)"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.
+    /// </summary>
+    private bool Search_Row(in int[] p_arr, in int p_input, in int p_idx, in bool p_excludeIdx)
     {
         for (int a_startIdx = rowOf[p_idx] * rows, a_limitIdx = a_startIdx + rows, i = a_startIdx; i < a_limitIdx; ++i)
-            if (i != p_idx && p_arr[i] == p_input) return true;
+            if ((!p_excludeIdx || i != p_idx) && p_arr[i] == p_input) return true;
         return false;
     }
 
     /// <summary>
-    /// True when <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s column (<paramref name="p_idx"/> itself excluded).
-    /// Serves <see cref="FindConflicts"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.
+    /// Whether <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s column (<paramref name="p_idx"/> itself excluded if <paramref name="p_excludeIdx"/> is <see langword="true"/>).
+    /// Serves <see cref="FindConflicts(in int[], in int, in int, in bool)"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.
     /// </summary>
-    private bool Search_Column(in int[] p_arr, in int p_input, in int p_idx)
+    private bool Search_Column(in int[] p_arr, in int p_input, in int p_idx, in bool p_excludeIdx)
     {
         for (int i = colOf[p_idx]; i < squares; i += rows)
-            if (i != p_idx && p_arr[i] == p_input) return true;
+            if ((!p_excludeIdx || i != p_idx) && p_arr[i] == p_input) return true;
         return false;
     }
 
     /// <summary>
-    /// True when <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s segment (<paramref name="p_idx"/> itself excluded).
-    /// Serves <see cref="FindConflicts"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.</summary>
-    private bool Search_Segment(in int[] p_arr, in int p_input, in int p_idx)
+    /// Whether <paramref name="p_input"/> also occurs in <paramref name="p_idx"/>'s segment (<paramref name="p_idx"/> itself excluded if <paramref name="p_excludeIdx"/> is <see langword="true"/>).
+    /// Serves <see cref="FindConflicts(in int[], in int, in int, in bool)"/> on caller-supplied boards; the solver itself relies on the candidate masks instead.</summary>
+    private bool Search_Segment(in int[] p_arr, in int p_input, in int p_idx, in bool p_excludeIdx)
     {
         int a_startIdx = rowOf[p_idx] / rank * squaresInSegmentRow + colOf[p_idx] / rank * rank;
         for (int i_row = 0; i_row < rank; ++i_row)
             for (int i_col = 0; i_col < rank; ++i_col)
             {
                 int a_idx = a_startIdx + i_row * rows + i_col;
-                if (a_idx != p_idx && p_arr[a_idx] == p_input) return true;
+                if ((!p_excludeIdx || a_idx != p_idx) && p_arr[a_idx] == p_input) return true;
             }
         return false;
     }
