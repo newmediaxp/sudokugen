@@ -8,6 +8,8 @@ How the Sudoku Gen packages get published. This is for maintainers; the package 
 
 * The primary repo is on [GitLab](https://gitlab.com/newmediaxp/sudokugen). It push-mirrors to
   [GitHub](https://github.com/newmediaxp/sudokugen), where releases and CI run.
+* The mirror makes GitHub's branches and tags match GitLab's, so it deletes a tag that exists only on GitHub,
+  and a GitHub Release whose tag is deleted turns back into a draft. Create every tag in GitLab, never on GitHub.
 * Publishing a GitHub Release runs [publish.yml](./.github/workflows/publish.yml). Every language shares it,
   so each job checks the release tag's prefix and only the matching language publishes.
 * The registries trust that workflow through trusted publishing (OIDC), so no API keys are stored.
@@ -17,12 +19,20 @@ How the Sudoku Gen packages get published. This is for maintainers; the package 
 ### Steps
 
 1. Bump the version (see the language below) and commit it on main.
-2. Push to GitLab, then wait until GitHub's main has that commit. The mirror isn't instant. A release tagged
-   before the bump commit arrives builds the old version, the registry skips it as a duplicate, and the run
-   still shows success while nothing new is published.
-3. On GitHub, create a Release on that commit, tagged with the language's prefix (`csharp-v1.2.0`, `js-v1.2.0`),
-   and publish it.
-4. Check the run on the Actions page, then the package on its registry.
+2. Tag that commit with the language's prefix and push both to GitLab, for example:
+
+   ```
+   git tag -a csharp-v1.2.0 -m "csharp 1.2.0"
+   git push gitlab main csharp-v1.2.0
+   ```
+
+3. Wait until GitHub shows the tag. The mirror isn't instant.
+4. On GitHub, create a Release, choose the existing tag from the tag list (don't type a new one, which would
+   create the tag on GitHub), and publish it.
+5. Check the run on the Actions page, then the package on its registry.
+
+Tagging the bump commit itself also prevents an old mistake: a release made on GitHub before the bump commit had
+mirrored built the old version, the registry skipped it as a duplicate, and the run still showed success.
 
 ---
 
