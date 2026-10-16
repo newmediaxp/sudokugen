@@ -14,7 +14,8 @@ This file will hold the whole written spec:
 ## Test data
 
 The `tests/` folder holds the test data every language's tests load. The C# library, the reference
-implementation, produced it. Grids are puzzle codes (one character per square, `0` = blank, `.` between rows).
+implementation, produced it through [NMX.SudokuGen.SpecData](../csharp/NMX.SudokuGen.SpecData).
+Grids are puzzle codes (one character per square, `0` = blank, `.` between rows).
 
 | File           | Each entry                                              | An implementation must                                                        |
 |----------------|---------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -26,3 +27,8 @@ implementation, produced it. Grids are puzzle codes (one character per square, `
 Used by: the C# tests ([SpecDataTests.cs](../csharp/NMX.SudokuGen.Tests/Core/SpecDataTests.cs))
 and the JS tests ([spec.test.ts](../js/nmx.sudokugen.library/test/spec.test.ts)).
 A change that alters seeded output fails both, so it is a spec change for every language.
+After a deliberate one, rewrite the data from the repo root and make every language's tests pass again:
+
+```
+dotnet run --project csharp/NMX.SudokuGen.SpecData
+```

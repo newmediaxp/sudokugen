@@ -10,6 +10,7 @@ name: publish
 # The languages share this repo, so every job checks the tag prefix. A manual run (workflow_dispatch)
 # runs every job; the registries skip versions they already have.
 # NuGet's and npm's trusted publishing settings name this file: update them before renaming it.
+# The release steps are in RELEASING.md.
 on:
   release:
     types: [published]

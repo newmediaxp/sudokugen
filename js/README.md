@@ -23,13 +23,6 @@ npm run build      # emits each package's dist/ (also run by npm pack and npm pu
 * Seeds follow .NET's `System.Random`, so the same seed gives the same puzzle in both languages.
   `test/spec.test.ts` checks this against the data in [spec/tests](../spec/tests), which the C# library produced.
 
----
-
-## Release
-
-1. Bump `version` in the package's `package.json` and commit.
-2. Create a GitHub Release tagged `js-v<version>` (e.g. `js-v1.1.0`). The `publish-npm` job in
-   [publish.yml](../.github/workflows/publish.yml) tests the workspace and publishes the library to npm
-   through trusted publishing, with provenance.
+Releasing is in [RELEASING.md](../RELEASING.md#js).
 
 ---
