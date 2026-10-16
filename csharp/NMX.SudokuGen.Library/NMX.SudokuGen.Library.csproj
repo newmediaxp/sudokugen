@@ -16,8 +16,8 @@
     <Copyright>Copyright (c) 2024-2026 New Media XP</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://github.com/newmediaxp/sudoku-gen</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/newmediaxp/sudoku-gen.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/newmediaxp/sudokugen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/newmediaxp/sudokugen.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>sudoku;puzzle;solver;generator</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

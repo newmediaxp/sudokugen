@@ -101,7 +101,7 @@ Also exposes general array/bit helpers used internally — `Copy`, `Same`, `Coun
 
 * Downloads
 
-    * [Github](https://github.com/newmediaxp/sudoku-gen/releases)
+    * [Github](https://github.com/newmediaxp/sudokugen/releases)
 
 ---
 

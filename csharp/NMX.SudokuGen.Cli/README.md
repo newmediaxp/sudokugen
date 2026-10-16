@@ -82,7 +82,7 @@ Exit code is 0 on success, 1 when any argument or puzzle failed; errors print to
 
 * Downloads
 
-    * [Github](https://github.com/newmediaxp/sudoku-gen/releases)
+    * [Github](https://github.com/newmediaxp/sudokugen/releases)
 
 ---
 
