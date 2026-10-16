@@ -74,12 +74,16 @@ Every package's version is `major.minor.patch`.
 * Version: `version` in [js/nmx.sudokugen.library/package.json](./js/nmx.sudokugen.library/package.json).
 * Job: `publish-npm` runs `npm run check` in `js/`, then publishes the library to
   [npm](https://www.npmjs.com/package/nmx.sudokugen.library) with provenance.
-* First version: npm can't trust a workflow for a package that doesn't exist yet, so publish it by hand
-  from `js/nmx.sudokugen.library` (`npm login`, then `npm publish`).
-* First release through CI: on the same day, add a trusted publisher in the package's settings on npmjs.com
-  (organization or user `newmediaxp`, repository `sudokugen`, workflow filename `publish.yml`, the rest blank).
+* First version: npm can't trust a workflow for a package that doesn't exist yet, so 1.1.0 was published by hand
+  from `js/nmx.sudokugen.library` (`npm login`, then `npm publish`, confirmed with 2FA).
+* First release through CI: on the same day, add a trusted publisher in the package's settings on npmjs.com.
   npm deletes a new trusted publisher setting that no publish has used within 2 days, so don't add it earlier.
-  Once that run has published, set the package's Publishing access to "Require two-factor authentication
-  and disallow tokens", so only CI can publish.
+    * Publisher: GitHub Actions
+    * Organization or user: `newmediaxp`, repository: `sudokugen`, workflow filename: `publish.yml`
+    * Environment name: empty, since the job uses no GitHub environment. The label is optional.
+    * Allowed actions: tick "Allow npm publish". Without it npm only lets the workflow stage a release for
+      approval on the website, and the job's plain `npm publish` is refused. Leave "Allow npm dist-tag" unticked.
+* Publishing access, in the package's settings: "Require two-factor authentication and disallow bypass 2fa
+  tokens". Trusted publishing keeps working with it, and publishing by hand still works with 2FA.
 
 ---
