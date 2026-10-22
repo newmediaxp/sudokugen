@@ -2,6 +2,7 @@ name: publish
 
 # On a published GitHub Release whose tag starts with csharp-v (e.g. csharp-v1.2.0):
 #  - publishes NMX.SudokuGen.Library to NuGet.org (Trusted Publishing / OIDC, no stored key)
+#  - attaches the library DLL, its XML docs and the license to the release as a zip
 #  - builds Native AOT executables of the CLI for each platform and attaches them to the release
 #  - publishes the CLI to NuGet.org as the .NET tool NMX.SudokuGen.Cli (command sudokugen):
 #    one Native AOT package per platform, a framework-dependent fallback and the pointer package
@@ -24,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # required: lets the job request the OIDC token for trusted publishing
-      contents: read
+      contents: write   # required to upload the library zip to the release
     steps:
       - uses: actions/checkout@v7
 
@@ -53,6 +54,18 @@ jobs:
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
+
+      # for setups without NuGet (e.g. Unity's Assets/Plugins); runs after the push, so a failed upload
+      # never holds back NuGet, and zips outside ./artifacts, which holds only what NuGet gets
+      - name: Attach the library to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          lib=csharp/NMX.SudokuGen.Library/bin/Release/netstandard2.1
+          mkdir -p dist
+          zip -j dist/SudokuGenLib-netstandard2.1.zip "$lib/SudokuGenLib.dll" "$lib/SudokuGenLib.xml" LICENSE
+          gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
 
   publish-npm:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'js-v')

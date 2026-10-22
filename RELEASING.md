@@ -56,7 +56,8 @@ Every package's version is `major.minor.patch`.
 * Jobs:
     * `publish-nuget` runs the tests, packs the library and pushes it to
       [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library). The trusted publishing policy belongs to
-      the NuGet user NewMediaXP.
+      the NuGet user NewMediaXP. After the push it attaches `SudokuGenLib-netstandard2.1.zip` (the DLL, its XML
+      docs and the license) to the release, for setups without NuGet such as Unity's `Assets/Plugins`.
     * `cli-aot` builds Native AOT binaries of the CLI for 7 platforms, attaches them to the release, and packs
       each platform's tool package on that platform (Native AOT can't cross-compile between operating systems).
     * `publish-cli-tool` runs once all 7 succeed. It packs the framework-dependent `any` fallback and the
