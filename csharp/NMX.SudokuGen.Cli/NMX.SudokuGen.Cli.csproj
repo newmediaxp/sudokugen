@@ -9,7 +9,7 @@
     <PublishTrimmed>True</PublishTrimmed>
     <Title>SudokuGen CLI</Title>
     <PublishAot>true</PublishAot>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <PackageId>NMX.SudokuGen.Cli</PackageId>
     <Description>Sudoku generator and solver for the command line: the sudokugen tool creates, solves and shuffles puzzles. Installs as a Native AOT binary on Windows, Linux and macOS.</Description>
     <Company>New Media XP</Company>
