@@ -134,6 +134,10 @@ A square that is rule-clean but still wrong (`board[i] !== solution[i]`) returns
 
     * None. Needs an ES2022 runtime: current browsers, Node.js 20 or later, Deno, Bun.
 
+* Used in
+
+    * Sudoku Gen web app [(link)](https://www.newmediaxp.com/app/sudokugen)
+
 * Other languages
 
     * C# library: [NMX.SudokuGen.Library](https://www.nuget.org/packages/NMX.SudokuGen.Library)
@@ -144,7 +148,7 @@ A square that is rule-clean but still wrong (`board[i] !== solution[i]`) returns
 
 * Source
 
-    * [GitHub](https://github.com/newmediaxp/sudokugen/tree/main/js/nmx.sudokugen.library)
+    * [GitHub](https://github.com/newmediaxp/sudokugen/tree/main/javascript/nmx.sudokugen.library)
 
 ---
 

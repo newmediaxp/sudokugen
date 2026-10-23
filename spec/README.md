@@ -25,7 +25,7 @@ Grids are puzzle codes (one character per square, `0` = blank, `.` between rows)
 | `solve.json`   | `input`, `solution`                                     | solve `input` to `solution`, or fail when `solution` is `null`.               |
 
 Used by: the C# tests ([SpecDataTests.cs](../csharp/NMX.SudokuGen.Tests/Core/SpecDataTests.cs))
-and the JS tests ([spec.test.ts](../js/nmx.sudokugen.library/test/spec.test.ts)).
+and the JS tests ([spec.test.ts](../javascript/nmx.sudokugen.library/test/spec.test.ts)).
 A change that alters seeded output fails both, so it is a spec change for every language.
 After a deliberate one, rewrite the data from the repo root and make every language's tests pass again:
 

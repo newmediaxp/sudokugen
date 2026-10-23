@@ -26,6 +26,13 @@ and they all follow the shared [spec](./spec).
 
 ---
 
+## Used in
+
+* [Sudoku Gen web app](https://www.newmediaxp.com/app/sudokugen) — create, solve, play and share puzzles in the browser
+* [Shaolin Sudoku](https://www.newmediaxp.com/blog/article/shaolin-sudoku) — a sudoku game, on itch.io and Game Jolt
+
+---
+
 ## Contents
 
 * [csharp](./csharp) — the C# library and CLI app, in one Visual Studio solution
@@ -35,8 +42,8 @@ and they all follow the shared [spec](./spec).
       [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Cli) as the .NET tool `sudokugen`,
       with standalone binaries on [GitHub Releases](https://github.com/newmediaxp/sudokugen/releases)
     * [NMX.SudokuGen.Tests](./csharp/NMX.SudokuGen.Tests) — the xUnit tests for the C# library
-* [js](./js) — the JS packages, in one npm workspace
-    * [nmx.sudokugen.library](./js/nmx.sudokugen.library) — the JS library (TypeScript, ES modules),
+* [javascript](./javascript) — the JS packages, in one npm workspace
+    * [nmx.sudokugen.library](./javascript/nmx.sudokugen.library) — the JS library (TypeScript, ES modules),
       published on [npm](https://www.npmjs.com/package/nmx.sudokugen.library)
 * [spec](./spec) — the shared spec every language follows: library API, puzzle code format,
   CLI and test data (in progress)
@@ -76,7 +83,7 @@ sudokugen solve 390560027.001809405.600172893.180257900.500643000.204081570.0030
 The [library README](./csharp/NMX.SudokuGen.Library) has the full API,
 and the [CLI README](./csharp/NMX.SudokuGen.Cli) has every command and flag.
 
-### js
+### javascript
 
 Library: install it from npm.
 
@@ -92,7 +99,7 @@ const a_code   = getPuzzleCode(a_sudoku.puzzle);
 const a_solved = Sudoku.solve(a_sudoku.puzzle);       // throws unless the puzzle has exactly one solution
 ```
 
-The [library README](./js/nmx.sudokugen.library) has the full API.
+The [library README](./javascript/nmx.sudokugen.library) has the full API.
 
 ---
 

@@ -429,8 +429,8 @@ FodyWeavers.xsd
 *.msp
 
 # JS packages: build output, packed tarballs, and the LICENSE copy that prepack adds
-js/*/dist/
-js/*/LICENSE
+javascript/*/dist/
+javascript/*/LICENSE
 *.tgz
 
 # AI assistant artifacts

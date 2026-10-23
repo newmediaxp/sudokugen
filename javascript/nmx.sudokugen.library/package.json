@@ -8,14 +8,14 @@
         "solver",
         "generator"
     ],
-    "homepage": "https://github.com/newmediaxp/sudokugen/tree/main/js/nmx.sudokugen.library#readme",
+    "homepage": "https://github.com/newmediaxp/sudokugen/tree/main/javascript/nmx.sudokugen.library#readme",
     "bugs": {
         "url": "https://github.com/newmediaxp/sudokugen/issues"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/newmediaxp/sudokugen.git",
-        "directory": "js/nmx.sudokugen.library"
+        "directory": "javascript/nmx.sudokugen.library"
     },
     "license": "MIT",
     "author": "New Media XP <contact@newmediaxp.com> (https://www.newmediaxp.com)",

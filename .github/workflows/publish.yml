@@ -7,9 +7,9 @@ name: publish
 #  - publishes the CLI to NuGet.org as the .NET tool NMX.SudokuGen.Cli (command sudokugen):
 #    one Native AOT package per platform, a framework-dependent fallback and the pointer package
 #  Bump <Version> in the csprojs and commit before creating the release.
-# On a published GitHub Release whose tag starts with js-v (e.g. js-v1.2.0):
+# On a published GitHub Release whose tag starts with javascript-v (e.g. javascript-v1.2.0):
 #  - publishes nmx.sudokugen.library to npm (Trusted Publishing / OIDC, with provenance)
-#  Bump "version" in js/nmx.sudokugen.library/package.json and commit before creating the release.
+#  Bump "version" in javascript/nmx.sudokugen.library/package.json and commit before creating the release.
 # The languages share this repo, so every job checks the tag prefix. A manual run (workflow_dispatch)
 # runs every job; the registries skip versions they already have.
 # NuGet's and npm's trusted publishing settings name this file: update them before renaming it.
@@ -68,20 +68,20 @@ jobs:
           gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
 
   publish-npm:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'js-v')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'javascript-v')
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # required: lets npm request the OIDC token for trusted publishing and provenance
       contents: read
     defaults:
       run:
-        working-directory: js
+        working-directory: javascript
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
-          node-version-file: js/.node-version
+          node-version-file: javascript/.node-version
           registry-url: https://registry.npmjs.org
 
       - name: Install

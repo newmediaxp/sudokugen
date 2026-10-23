@@ -1,5 +1,5 @@
 {
-    "name": "sudokugen-js",
+    "name": "sudokugen-javascript",
     "private": true,
     "description": "npm workspace holding the JS packages of Sudoku Gen",
     "license": "MIT",

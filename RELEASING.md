@@ -69,11 +69,11 @@ Every package's version is `major.minor.patch`.
 
 ---
 
-## js
+## javascript
 
-* Tag: `js-v<version>`
-* Version: `version` in [js/nmx.sudokugen.library/package.json](./js/nmx.sudokugen.library/package.json).
-* Job: `publish-npm` runs `npm run check` in `js/`, then publishes the library to
+* Tag: `javascript-v<version>`. 1.1.0 was tagged `js-v1.1.0`, from when the folder was `js`.
+* Version: `version` in [javascript/nmx.sudokugen.library/package.json](./javascript/nmx.sudokugen.library/package.json).
+* Job: `publish-npm` runs `npm run check` in `javascript/`, then publishes the library to
   [npm](https://www.npmjs.com/package/nmx.sudokugen.library) with provenance.
 * First version: npm can't trust a workflow for a package that doesn't exist yet, so 1.1.0 was published by hand
   from `js/nmx.sudokugen.library` (`npm login`, then `npm publish`, confirmed with 2FA).

@@ -23,6 +23,6 @@ npm run build      # emits each package's dist/ (also run by npm pack and npm pu
 * Seeds follow .NET's `System.Random`, so the same seed gives the same puzzle in both languages.
   `test/spec.test.ts` checks this against the data in [spec/tests](../spec/tests), which the C# library produced.
 
-Releasing is in [RELEASING.md](../RELEASING.md#js).
+Releasing is in [RELEASING.md](../RELEASING.md#javascript).
 
 ---
