@@ -1,3 +1,5 @@
+![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+
 # Sudoku Gen CLI
 
 `sudoku` `C#` `app` `cli`

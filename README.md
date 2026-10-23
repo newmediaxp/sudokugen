@@ -1,3 +1,5 @@
+![Sudoku Gen](./icon.png)
+
 # Sudoku Gen
 
 `sudoku` `csharp` `dotnet` `javascript` `typescript` `library` `cli`

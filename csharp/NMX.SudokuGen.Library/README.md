@@ -1,3 +1,5 @@
+![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+
 # Sudoku Gen Library
 
 `sudoku` `C#` `library` `dll`
