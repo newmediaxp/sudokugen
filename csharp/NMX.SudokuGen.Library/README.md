@@ -121,6 +121,10 @@ The minus-O sets skip `O` so it can't be misread as the blank `0`.
     * Sudoku Gen CLI [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Cli)
     * Shaolin Sudoku [(link)](https://www.newmediaxp.com/blog/article/shaolin-sudoku)
 
+* Unity
+
+    * OpenUPM: [com.newmediaxp.sudokugen](https://openupm.com/packages/com.newmediaxp.sudokugen)
+
 * Other languages
 
     * JS library: [nmx.sudokugen.library](https://www.npmjs.com/package/nmx.sudokugen.library)

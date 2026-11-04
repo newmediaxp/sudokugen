@@ -1,0 +1,2 @@
+# Its presence stops npm pack from applying the repo's .gitignore, which ignores the DLL, XML docs and
+# LICENSE.md that publish.yml copies in before packing. Nothing in this folder is left out of the package.

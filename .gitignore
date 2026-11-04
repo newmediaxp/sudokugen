@@ -433,6 +433,13 @@ javascript/*/dist/
 javascript/*/LICENSE
 *.tgz
 
+# Unity package: keep its .meta files (ignored above as Visual Studio files);
+# publish.yml copies in the DLL, its XML docs and the license before packing
+!unity/**/*.meta
+unity/*/Runtime/SudokuGenLib.dll
+unity/*/Runtime/SudokuGenLib.xml
+unity/*/LICENSE.md
+
 # AI assistant artifacts
 .claude/
 CLAUDE.md

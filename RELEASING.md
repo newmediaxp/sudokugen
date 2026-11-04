@@ -57,7 +57,8 @@ Every package's version is `major.minor.patch`.
     * `publish-nuget` runs the tests, packs the library and pushes it to
       [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library). The trusted publishing policy belongs to
       the NuGet user NewMediaXP. After the push it attaches `SudokuGenLib-netstandard2.1.zip` (the DLL, its XML
-      docs and the license) to the release, for setups without NuGet such as Unity's `Assets/Plugins`.
+      docs and the license) to the release, for setups without NuGet such as Unity's `Assets/Plugins`. Then it
+      attaches the Unity package `com.newmediaxp.sudokugen-<version>.tgz` (see [unity](#unity)).
     * `cli-aot` builds Native AOT binaries of the CLI for 7 platforms, attaches them to the release, and packs
       each platform's tool package on that platform (Native AOT can't cross-compile between operating systems).
     * `publish-cli-tool` runs once all 7 succeed. It packs the framework-dependent `any` fallback and the
@@ -84,5 +85,30 @@ Every package's version is `major.minor.patch`.
     * Environment name: empty, since the job uses no GitHub environment. The label is optional.
     * Allowed actions: tick "Allow npm publish". Without it npm only lets the workflow stage a release for
       approval on the website, and the job's plain `npm publish` is refused. Leave "Allow npm dist-tag" unticked.
+
+---
+
+## unity
+
+* Package: [com.newmediaxp.sudokugen](./unity/com.newmediaxp.sudokugen) on
+  [OpenUPM](https://openupm.com/packages/com.newmediaxp.sudokugen), the C# library's DLL as a Unity package.
+  It ships with every csharp release, so it has no tag or version of its own.
+* Version: its package.json has none. `publish-nuget` writes the library's `<Version>` in when it packs, and fails
+  that step if the tag isn't `csharp-v<that version>`.
+* Release: `publish-nuget` copies in the DLL, its XML docs and the license, runs `npm pack` in the package folder and
+  attaches the `.tgz` to the release. OpenUPM watches the repo's `csharp-v` tags and publishes the `.tgz` from the
+  matching release unchanged, usually within half an hour. Nothing needs doing on OpenUPM per release.
+* OpenUPM's settings are in `data/packages/com.newmediaxp.sudokugen.yml` in the
+  [openupm repo](https://github.com/openupm/openupm), changed by pull request there:
+    * `gitTagPrefix: csharp-v`, so it skips the `javascript-v` tags
+    * `trackingMode: githubRelease`, so it publishes the attached `.tgz` instead of packing the tagged commit
+      (which has no DLL)
+    * `githubReleaseAssetName: com.newmediaxp.sudokugen-`, to pick the `.tgz` out of the release's assets
+    * `minVersion: 1.2.1`, since older csharp releases have no `.tgz`
+* `.meta` files: Unity needs one for every file and folder in a package, and can't make them inside an installed
+  package, so they're committed. The root .gitignore ignores `*.meta` except under `unity/`. The DLL's, XML docs'
+  and license's are committed too, though CI copies those files in. A file added to the package needs its `.meta`:
+  put the package folder, with the DLL in, under a Unity project's `Packages/`, open the project, and commit the
+  `.meta` files Unity writes.
 
 ---
