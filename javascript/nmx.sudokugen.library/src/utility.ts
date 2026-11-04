@@ -3,38 +3,139 @@
 import type { Random } from "./random.ts";
 
 /**
- * Encodes a grid as one character per square, row by row: 0 = blank, 1-9 as digits,
- * 10 and above as letters ('A' = 10), '.' between rows.
- * Values above 35 ('Z') are unrepresentable, so rank 5 (25x25) at most.
- * @param p_puzz The grid to encode, row by row.
- * @returns The puzzle code, e.g. "0012.3400...".
+ * Character sets a puzzle code can be written in. Blank (0) is '0' in every one of them.
  */
-export function getPuzzleCode(p_puzz: ArrayLike<number>): string {
+export const EncodingOption = Object.freeze({
+    /** 1 to 9 as digits, then 10 to 35 as A to Z. Fits every rank. */
+    All: 0,
+    /** 1 to 9 as digits, then 10 to 34 as A to Z without O, so it can't be misread as blank '0'. Fits every rank. */
+    AllMinusO: 1,
+    /** 1 to 9 as digits only. Fits rank 3 and below. */
+    DigitsOnly: 2,
+    /** 1 to 26 as A to Z. Fits every rank. */
+    LettersOnly: 3,
+    /** 1 to 25 as A to Z without O, so it can't be misread as blank '0'. Fits every rank. */
+    LettersOnlyMinusO: 4,
+} as const);
+/** One of the {@link EncodingOption} values. */
+export type EncodingOption = (typeof EncodingOption)[keyof typeof EncodingOption];
+
+// the highest square value each encoding can write, indexed by EncodingOption; blank (0) is '0' on top of these
+const maxValues: readonly number[] = [35, 34, 9, 26, 25];
+const encodingNames: readonly string[] = Object.keys(EncodingOption);
+
+function maxValue(p_encoding: EncodingOption): number {
+    const a_maxValue = Number.isInteger(p_encoding) ? maxValues[p_encoding] : undefined;
+    if (a_maxValue === undefined) throw new RangeError(`unknown encoding ${p_encoding}`);
+    return a_maxValue;
+}
+
+/**
+ * The highest rank whose grids an encoding can write; a rank r grid holds values up to r^2.
+ * Never above Sudoku.maxRank, since no encoding writes past 35.
+ * @param p_encoding The character set to check.
+ * @returns 3 for {@link EncodingOption.DigitsOnly}, 5 for every other encoding.
+ * @throws {RangeError} The encoding is not an {@link EncodingOption} value.
+ */
+export function maxRank(p_encoding: EncodingOption): number {
+    return Math.trunc(Math.sqrt(maxValue(p_encoding)));
+}
+
+// the letter at index p_letterIdx of A to Z with O skipped; 'A' = 65, 'O' - 'A' = 14
+function letterMinusO(p_letterIdx: number): string {
+    return String.fromCharCode(65 + (p_letterIdx < 14 ? p_letterIdx : p_letterIdx + 1));
+}
+
+/**
+ * The character an encoding writes for one square value; blank (0) is '0' in every encoding.
+ * @param p_value The square value, from 0 (blank) up to what the encoding can write.
+ * @param p_encoding The character set to write it in.
+ * @returns A single character.
+ * @throws {RangeError} The value is not an integer within 0 and what the encoding can write,
+ * or the encoding is not an {@link EncodingOption} value.
+ */
+export function getSymbol(p_value: number, p_encoding: EncodingOption): string {
+    const a_maxValue = maxValue(p_encoding);
+    if (!Number.isInteger(p_value) || p_value < 0 || p_value > a_maxValue)
+        throw new RangeError(`value ${p_value} is outside 0..${a_maxValue} for ${encodingNames[p_encoding]} encoding`);
+    if (p_value === 0) return "0";
+    // '0' = 48, 'A' - 10 = 55, 'A' - 1 = 64
+    switch (p_encoding) {
+        case EncodingOption.All:
+            return String.fromCharCode(p_value <= 9 ? 48 + p_value : 55 + p_value);
+        case EncodingOption.AllMinusO:
+            return p_value <= 9 ? String.fromCharCode(48 + p_value) : letterMinusO(p_value - 10);
+        case EncodingOption.DigitsOnly:
+            return String.fromCharCode(48 + p_value);
+        case EncodingOption.LettersOnly:
+            return String.fromCharCode(64 + p_value);
+        case EncodingOption.LettersOnlyMinusO:
+            return letterMinusO(p_value - 1);
+    }
+}
+
+// the value one character code stands for under p_encoding, or -1 when the encoding doesn't use that character
+function getValue(p_char: number, p_encoding: EncodingOption): number {
+    // '0'..'9' = 48..57, 'A'..'Z' = 65..90, 'a'..'z' = 97..122, 'O' = 79
+    if (p_char === 48) return 0;
+    // ASCII-only case fold; toUpperCase would also turn 'ı' and 'ſ' into letters
+    const a_upper = p_char >= 97 && p_char <= 122 ? p_char - 32 : p_char;
+    const a_digit = a_upper >= 49 && a_upper <= 57 ? a_upper - 48 : -1;
+    const a_letter = a_upper >= 65 && a_upper <= 90 ? a_upper - 65 : -1;
+    // O is not a symbol of the minus-O encodings, so it is ignored like any other unused character
+    const a_letterMinusO = a_letter < 0 || a_upper === 79 ? -1 : a_upper < 79 ? a_letter : a_letter - 1;
+    switch (p_encoding) {
+        case EncodingOption.All:
+            return a_digit > 0 ? a_digit : a_letter >= 0 ? a_letter + 10 : -1;
+        case EncodingOption.AllMinusO:
+            return a_digit > 0 ? a_digit : a_letterMinusO >= 0 ? a_letterMinusO + 10 : -1;
+        case EncodingOption.DigitsOnly:
+            return a_digit;
+        case EncodingOption.LettersOnly:
+            return a_letter >= 0 ? a_letter + 1 : -1;
+        case EncodingOption.LettersOnlyMinusO:
+            return a_letterMinusO >= 0 ? a_letterMinusO + 1 : -1;
+    }
+}
+
+/**
+ * Encodes a grid as one character per square, row by row, '.' between rows.
+ * By default ({@link EncodingOption.All}): 0 = blank, 1-9 as digits, 10 and above as letters ('A' = 10).
+ * Values above 35 ('Z') are unrepresentable and throw, so rank 5 (25x25) at most.
+ * @param p_puzz The grid to encode, row by row.
+ * @param p_encoding The character set to write; {@link maxRank} gives the ranks it fits.
+ * Blank (0) is '0' in every encoding.
+ * @returns The puzzle code, e.g. "0012.3400..." by default or in {@link EncodingOption.All},
+ * or "00AB.CD00..." in {@link EncodingOption.LettersOnly}.
+ * @throws {RangeError} A value is not an integer within 0 and what the encoding can write,
+ * or the encoding is not an {@link EncodingOption} value.
+ */
+export function getPuzzleCode(p_puzz: ArrayLike<number>, p_encoding: EncodingOption = EncodingOption.All): string {
+    maxValue(p_encoding);
     const a_rows = Math.trunc(Math.sqrt(p_puzz.length));
     let a_puzzleCode = "";
     for (let i = 0; i < p_puzz.length; ++i) {
         if (i > 0 && i % a_rows === 0) a_puzzleCode += ".";
-        const a_value = p_puzz[i];
-        // 'A' - 10 = 55, '0' = 48
-        a_puzzleCode += String.fromCharCode(a_value > 9 ? 55 + a_value : 48 + a_value);
+        a_puzzleCode += getSymbol(p_puzz[i], p_encoding);
     }
     return a_puzzleCode;
 }
 
 /**
  * Parses a puzzle code back into a grid array.
- * @param p_code Text containing the grid as digits and letters ('A' or 'a' = 10);
- * every other character is ignored.
+ * The encoding can't be told from the code itself (a code without 'O' may or may not be a minus-O one), so it is given.
+ * @param p_code Text containing the grid, '0' = blank, letters in either case ('A' or 'a' = 10 by default);
+ * every character the encoding doesn't use is ignored, including 'O' in the minus-O encodings.
+ * @param p_encoding The character set the code was written in; the default reads it as {@link EncodingOption.All}.
  * @returns One element per recognised character, in order.
+ * @throws {RangeError} The encoding is not an {@link EncodingOption} value.
  */
-export function getPuzzleArr(p_code: string): number[] {
+export function getPuzzleArr(p_code: string, p_encoding: EncodingOption = EncodingOption.All): number[] {
+    maxValue(p_encoding);
     const a_puzzle: number[] = [];
     for (let i = 0; i < p_code.length; ++i) {
-        const c = p_code.charCodeAt(i);
-        // '0'..'9' = 48..57, 'A'..'Z' = 65..90, 'a'..'z' = 97..122
-        if (c >= 48 && c <= 57) a_puzzle.push(c - 48);
-        else if (c >= 65 && c <= 90) a_puzzle.push(c - 55);
-        else if (c >= 97 && c <= 122) a_puzzle.push(c - 87);
+        const a_value = getValue(p_code.charCodeAt(i), p_encoding);
+        if (a_value !== -1) a_puzzle.push(a_value);
     }
     return a_puzzle;
 }

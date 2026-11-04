@@ -19,9 +19,10 @@ public static class SudokuGen
         cmdVersion1 = "version", cmdVersion2 = "--version", cmdVersion3 = "-v",
         cmdHelp1 = "help", cmdHelp2 = "--help", cmdHelp3 = "-h",
         cmdCreate = "create", cmdSolve = "solve", cmdShuffle = "shuffle",
-        fgvRank = "-r", fgvBlanks = "-b", fgvCount = "-c", fgvSeed = "-s", fgvInput = "-i", fgvOutput = "-o",
+        fgvRank = "-r", fgvBlanks = "-b", fgvCount = "-c", fgvSeed = "-s", fgvInput = "-i", fgvOutput = "-o", fgvEncoding = "-e",
         flgSolutionOutput = "-osol", flgPuzzleOutput = "-opuz", flgMinimalOutput = "-omin", flgBoardOutput = "-oboard", flgExactBlanks = "-exact", flgParallel = "-para",
         valBlanksMax = "max", valMinRank = "2", valMaxRank = "5",
+        valEncAll = "all", valEncAllNoO = "all-no-o", valEncDigits = "digits", valEncLetters = "letters", valEncLettersNoO = "letters-no-o",
         expRank = "4", expBlanks = "120", expTimes = "10", expSeed = "777",
         expInput = "./inputs.txt", expOutput = "./outputs.txt",
         expPuzz = "390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300";
@@ -49,6 +50,7 @@ public static class SudokuGen
                 4. {{fgvSeed}} {{"\t"}}: Specify seed for reproducible results. Where Command = { {{cmdCreate}}, {{cmdShuffle}} }.
                 5. {{fgvInput}} {{"\t"}}: Specify input .txt file. Where Command = { {{cmdSolve}}, {{cmdShuffle}} }.
                 6. {{fgvOutput}} {{"\t"}}: Specify output .txt file. Where Command = { {{cmdCreate}}, {{cmdSolve}}, {{cmdShuffle}} }.
+                7. {{fgvEncoding}} {{"\t"}}: Specify puzzle code encoding, for reading and writing. Encoding = { {{valEncAll}}, {{valEncAllNoO}}, {{valEncDigits}}, {{valEncLetters}}, {{valEncLettersNoO}} }, default {{valEncAll}}. Blanks are always 0, {{valEncDigits}} fits r <= 3. Where Command = { {{cmdCreate}}, {{cmdSolve}}, {{cmdShuffle}} }.
 
             flags without value -
                 1. {{flgPuzzleOutput}} {{"\t"}}: Include the puzzle. Where Command = { {{cmdSolve}} }.
@@ -63,20 +65,22 @@ public static class SudokuGen
                 2. {{cmdCreate}} {{fgvRank}} {{expRank}} {{fgvBlanks}} {{expBlanks}} {{fgvSeed}} {{expSeed}}
                 3. {{cmdCreate}} {{fgvBlanks}} -1 {{flgExactBlanks}}
                 4. {{cmdCreate}} {{fgvCount}} {{expTimes}} {{fgvOutput}} {{expOutput}}
-                5. {{cmdSolve}} {{expPuzz}}
-                6. {{cmdSolve}} {{fgvInput}} {{expInput}} {{fgvOutput}} {{expOutput}}
-                7. {{cmdShuffle}} {{expPuzz}} {{fgvSeed}} {{expSeed}}
+                5. {{cmdCreate}} {{fgvRank}} {{expRank}} {{fgvEncoding}} {{valEncLettersNoO}}
+                6. {{cmdSolve}} {{expPuzz}}
+                7. {{cmdSolve}} {{fgvInput}} {{expInput}} {{fgvOutput}} {{expOutput}}
+                8. {{cmdShuffle}} {{expPuzz}} {{fgvSeed}} {{expSeed}}
 
         """;
 
     private static string GetSudokuVisual(in Sudoku p_sudoku, in string p_time, in bool p_showRank,
-        in bool p_showPuzzle, in bool p_showSolution, in bool p_drawBoard)
+        in bool p_showPuzzle, in bool p_showSolution, in bool p_drawBoard, in Utility.EncodingOption p_encoding)
     {
         StringBuilder a_visual = new();
         if (p_showRank) _ = a_visual.Append($"\trank={p_sudoku.rank}\tgiven={p_sudoku.squares - p_sudoku.Removed}\ttime={p_time}\n");
         if (p_drawBoard)
         {
             int a_rows = p_sudoku.rows, a_squares = p_sudoku.squares;
+            Utility.EncodingOption a_encoding = p_encoding;
             void DrawLine()
             {
                 a_visual.Append('+');
@@ -88,7 +92,7 @@ public static class SudokuGen
                 DrawLine();
                 for (int i = 0; i < a_squares; ++i)
                 {
-                    _ = a_visual.Append($"| {(p_puzz[i] == 0 ? ' ' : p_puzz[i] > 9 ? (char)('A' + p_puzz[i] - 10) : (char)('0' + p_puzz[i]))} ");
+                    _ = a_visual.Append($"| {(p_puzz[i] == 0 ? ' ' : Utility.GetSymbol(p_puzz[i], a_encoding))} ");
                     if (i % a_rows + 1 == a_rows) { _ = a_visual.Append('|').Append('\n'); DrawLine(); }
                 }
             }
@@ -98,9 +102,9 @@ public static class SudokuGen
         }
         else
         {
-            if (p_showPuzzle) a_visual.Append($"puz=({Utility.GetPuzzleCode(p_sudoku.Puzzle)})");
+            if (p_showPuzzle) a_visual.Append($"puz=({Utility.GetPuzzleCode(p_sudoku.Puzzle, p_encoding)})");
             if (p_showPuzzle && p_showSolution) a_visual.Append('\n');
-            if (p_showSolution) a_visual.Append($"sol=({Utility.GetPuzzleCode(p_sudoku.Solution)})");
+            if (p_showSolution) a_visual.Append($"sol=({Utility.GetPuzzleCode(p_sudoku.Solution, p_encoding)})");
             a_visual.Append('\n');
         }
         return a_visual.ToString();
@@ -116,13 +120,15 @@ public static class SudokuGen
             => PrintError($"invalid value '{p_value}' for flag '{p_flag}'");
         CLAP a_clap = new([cmdCreate, cmdSolve, cmdShuffle, cmdVersion1, cmdVersion2, cmdVersion3, cmdHelp1, cmdHelp2, cmdHelp3],
             [flgMinimalOutput, flgBoardOutput, flgSolutionOutput, flgPuzzleOutput, flgExactBlanks, flgParallel],
-            [fgvRank, fgvBlanks, fgvCount, fgvSeed, fgvInput, fgvOutput]);
+            [fgvRank, fgvBlanks, fgvCount, fgvSeed, fgvInput, fgvOutput, fgvEncoding]);
         (bool a_success, string a_cmd_or_msg) = a_clap.Process(p_inputs);
         if (!a_success) { PrintError($"{a_cmd_or_msg} (try '{cmdHelp1}')"); return 1; }
         int a_rank = dftRank, a_times = dftTimes;
         int? a_blanks = null, a_seed = null;
         bool a_minimalOutput = false, a_boardOutput = false, a_solutionOutput = false, a_puzzleOutput = false, a_exactBlanks = false, a_parallel = false;
         string? a_inputPath = null, a_outputPath = null;
+        Utility.EncodingOption a_encoding = Utility.EncodingOption.All;
+        string a_encodingName = valEncAll;
         foreach (KeyValuePair<string, bool> a_kvp in a_clap.flags)
         {
             if (!a_kvp.Value) continue;
@@ -209,6 +215,23 @@ public static class SudokuGen
                     catch { Error_ValueForFlag(a_kvp.Key, a_kvp.Value); return 1; }
                     a_outputPath = a_kvp.Value;
                     break;
+                case fgvEncoding:
+                    if (a_cmd_or_msg is not (cmdCreate or cmdSolve or cmdShuffle))
+                    { Error_FlagForCommand(a_kvp.Key, a_cmd_or_msg); return 1; }
+                    a_encodingName = a_kvp.Value.ToLowerInvariant();
+                    Utility.EncodingOption? a_encodingValue = a_encodingName switch
+                    {
+                        valEncAll => Utility.EncodingOption.All,
+                        valEncAllNoO => Utility.EncodingOption.AllMinusO,
+                        valEncDigits => Utility.EncodingOption.DigitsOnly,
+                        valEncLetters => Utility.EncodingOption.LettersOnly,
+                        valEncLettersNoO => Utility.EncodingOption.LettersOnlyMinusO,
+                        _ => null,
+                    };
+                    if (a_encodingValue is not Utility.EncodingOption a_encodingParsed)
+                    { Error_ValueForFlag(a_kvp.Key, a_kvp.Value); return 1; }
+                    a_encoding = a_encodingParsed;
+                    break;
                 default: PrintError($"unhandled flag '{a_kvp.Key}'"); return 1;
             }
         }
@@ -217,6 +240,10 @@ public static class SudokuGen
         int a_squares = a_rank * a_rank * a_rank * a_rank;
         int a_blanksFinal = a_blanks ?? a_rank * a_rank * a_rank;
         if (a_blanksFinal > a_squares) { Error_ValueForFlag(fgvBlanks, $"{a_blanksFinal}"); return 1; }
+        // the same goes for whether the encoding can write the grid; solve and shuffle only learn the rank per code,
+        // so there an unfitting encoding surfaces as that code's error instead
+        if (a_cmd_or_msg is cmdCreate && a_rank > Utility.MaxRank(a_encoding))
+        { PrintError($"encoding '{a_encodingName}' fits rank {Utility.MaxRank(a_encoding)} at most"); return 1; }
         bool a_anyFailed = false;
         StringBuilder a_output = new(a_minimalOutput ? string.Empty : $"[ {DateTime.Now} ]\n");
         void WriteOutput()
@@ -252,7 +279,7 @@ public static class SudokuGen
                             ? Sudoku.Create(a_rank, a_blanksFinal, a_seedNum, a_exactBlanks)
                             : Sudoku.Create(a_rank, a_blanksFinal, a_exactBlanks);
                         a_sb.Append(GetSudokuVisual(a_sudoku, $"{a_watch.Elapsed.TotalMilliseconds}ms",
-                            !a_minimalOutput, true, a_solutionOutput, a_boardOutput));
+                            !a_minimalOutput, true, a_solutionOutput, a_boardOutput, a_encoding));
                     }
                     catch (Exception p_ex) { a_sb.Append($"Error: {p_ex.Message}\n"); a_failed[p_i] = true; }
                     return a_sb.ToString();
@@ -281,11 +308,11 @@ public static class SudokuGen
                     try
                     {
                         Stopwatch a_watch = Stopwatch.StartNew();
-                        Sudoku a_sudoku = Sudoku.Solve(Utility.GetPuzzleArr(a_puzzCodes[p_i]));
+                        Sudoku a_sudoku = Sudoku.Solve(Utility.GetPuzzleArr(a_puzzCodes[p_i], a_encoding));
                         if (a_cmd_or_msg is cmdShuffle)
                             a_sudoku = a_seed is int a_seedNum ? a_sudoku.Shuffle(a_seedNum) : a_sudoku.Shuffle();
                         a_sb.Append(GetSudokuVisual(a_sudoku, $"{a_watch.Elapsed.TotalMilliseconds}ms",
-                            !a_minimalOutput, a_cmd_or_msg is cmdShuffle || a_puzzleOutput, a_cmd_or_msg is cmdSolve || a_solutionOutput, a_boardOutput));
+                            !a_minimalOutput, a_cmd_or_msg is cmdShuffle || a_puzzleOutput, a_cmd_or_msg is cmdSolve || a_solutionOutput, a_boardOutput, a_encoding));
                     }
                     catch (Exception p_ex) { a_sb.Append($"Error: {p_ex.Message}\n"); a_failed[p_i] = true; }
                     return a_sb.ToString();

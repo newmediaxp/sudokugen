@@ -101,8 +101,31 @@ A square that is rule-clean but still wrong (`board[i] !== solution[i]`) returns
 
 | Function        | Signature                                         | Description                                                                                             |
 |-----------------|---------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `getPuzzleCode` | `getPuzzleCode(grid: ArrayLike<number>): string`  | Encodes a grid as a puzzle code: one char per square (`0` blank, `1`-`9`, `A` = 10…), `.` between rows. |
-| `getPuzzleArr`  | `getPuzzleArr(code: string): number[]`            | Parses a puzzle code back into a grid array; unrecognised characters are ignored.                       |
+| `getPuzzleCode` | `getPuzzleCode(grid: ArrayLike<number>, encoding?: EncodingOption): string` | Encodes a grid as a puzzle code: one char per square (`0` blank, `1`-`9`, `A` = 10…), `.` between rows. With an `encoding`, writes in that one instead (default `All`). Throws a `RangeError` if a value doesn't fit the encoding. |
+| `getPuzzleArr`  | `getPuzzleArr(code: string, encoding?: EncodingOption): number[]` | Parses a puzzle code back into a grid array; unrecognised characters are ignored. The encoding can't be detected from the code, so pass the one it was written in (default `All`). |
+| `getSymbol`     | `getSymbol(value: number, encoding: EncodingOption): string` | The character one square value is written as.                                                 |
+| `maxRank`       | `maxRank(encoding: EncodingOption): number`       | The highest rank the encoding can write.                                                                |
+
+### `EncodingOption`
+
+Frozen character sets for puzzle codes. Blank is `0` in every one. Letters read in either case.
+
+| Value               | Values written as                              | Max rank |
+|---------------------|------------------------------------------------|----------|
+| `All`               | `1`-`9`, then `A`-`Z` (`A` = 10). The default. | 5        |
+| `AllMinusO`         | `1`-`9`, then `A`-`Z` without `O`              | 5        |
+| `DigitsOnly`        | `1`-`9`                                        | 3        |
+| `LettersOnly`       | `A`-`Z` (`A` = 1)                              | 5        |
+| `LettersOnlyMinusO` | `A`-`Z` without `O` (`A` = 1)                  | 5        |
+
+The minus-O sets skip `O` so it can't be misread as the blank `0`.
+
+```js
+import { EncodingOption, getPuzzleArr, getPuzzleCode } from "nmx.sudokugen.library";
+
+const a_letters = getPuzzleCode(a_sudoku.puzzle, EncodingOption.LettersOnly); // e.g. "CI0EF00BG.00AH0I0DE...."
+const a_grid    = getPuzzleArr(a_letters, EncodingOption.LettersOnly);       // read it back in the same encoding
+```
 
 ### Notes
 

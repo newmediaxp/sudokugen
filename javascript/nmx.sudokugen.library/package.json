@@ -1,6 +1,6 @@
 {
     "name": "nmx.sudokugen.library",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Sudoku generator and solver: unique-solution puzzle creation (optionally seeded), solving, validation, conflict reporting and isomorphic shuffling.",
     "keywords": [
         "sudoku",

@@ -127,4 +127,71 @@ public sealed class UtilityTests
     {
         Assert.Equal(new int[] { 10, 35, 10, 35 }, GetPuzzleArr("AZaz"));
     }
+
+    // apps compiled against earlier versions call the one-argument signatures, so the encoding overloads sit beside them
+    [Fact]
+    public void PuzzleCode_KeepsOneArgumentSignaturesForCompiledApps()
+    {
+        Type a_list = typeof(IReadOnlyList<int>).MakeByRefType(), a_string = typeof(string).MakeByRefType();
+        Assert.NotNull(typeof(Utility).GetMethod(nameof(GetPuzzleCode), [a_list]));
+        Assert.NotNull(typeof(Utility).GetMethod(nameof(GetPuzzleArr), [a_string]));
+    }
+
+    [Theory]
+    [InlineData(EncodingOption.All, 5)]
+    [InlineData(EncodingOption.AllMinusO, 5)]
+    [InlineData(EncodingOption.DigitsOnly, 3)]
+    [InlineData(EncodingOption.LettersOnly, 5)]
+    [InlineData(EncodingOption.LettersOnlyMinusO, 5)]
+    public void MaxRank_MatchesEachEncoding(EncodingOption p_encoding, int p_maxRank)
+    {
+        Assert.Equal(p_maxRank, MaxRank(p_encoding));
+    }
+
+    // every value a grid of the encoding's highest rank can hold, blanks included
+    [Theory]
+    [InlineData(EncodingOption.All)]
+    [InlineData(EncodingOption.AllMinusO)]
+    [InlineData(EncodingOption.DigitsOnly)]
+    [InlineData(EncodingOption.LettersOnly)]
+    [InlineData(EncodingOption.LettersOnlyMinusO)]
+    public void PuzzleCode_RoundTripsEveryEncoding(EncodingOption p_encoding)
+    {
+        int a_rows = MaxRank(p_encoding) * MaxRank(p_encoding);
+        int[] a_puzz = new int[a_rows * a_rows];
+        for (int i = 0; i < a_puzz.Length; ++i) a_puzz[i] = i % (a_rows + 1);
+        string a_code = GetPuzzleCode(a_puzz, p_encoding);
+        if (p_encoding is EncodingOption.AllMinusO or EncodingOption.LettersOnlyMinusO) Assert.DoesNotContain('O', a_code);
+        Assert.Equal(a_puzz, GetPuzzleArr(a_code, p_encoding));
+    }
+
+    [Theory]
+    [InlineData(EncodingOption.All, 35, "01.Z0")]
+    [InlineData(EncodingOption.AllMinusO, 34, "01.Z0")]
+    [InlineData(EncodingOption.DigitsOnly, 9, "01.90")]
+    [InlineData(EncodingOption.LettersOnly, 26, "0A.Z0")]
+    [InlineData(EncodingOption.LettersOnlyMinusO, 25, "0A.Z0")]
+    public void GetPuzzleCode_WritesBlankAsZeroAndThrowsPastTopValue(EncodingOption p_encoding, int p_maxValue, string p_code)
+    {
+        Assert.Equal(p_code, GetPuzzleCode([0, 1, p_maxValue, 0], p_encoding));
+        Assert.Throws<ArgumentOutOfRangeException>(() => GetPuzzleCode([0, 1, p_maxValue + 1, 0], p_encoding));
+    }
+
+    [Fact]
+    public void MinusOEncodings_SkipO()
+    {
+        // the value after N is written as P
+        Assert.Equal("NP.00", GetPuzzleCode([23, 24, 0, 0], EncodingOption.AllMinusO));
+        Assert.Equal("NP.00", GetPuzzleCode([14, 15, 0, 0], EncodingOption.LettersOnlyMinusO));
+        // O is not one of their symbols, so it is ignored like any other unused character
+        Assert.Equal(new int[] { 23, 24 }, GetPuzzleArr("NOP", EncodingOption.AllMinusO));
+        Assert.Equal(new int[] { 14, 15 }, GetPuzzleArr("NOP", EncodingOption.LettersOnlyMinusO));
+    }
+
+    [Fact]
+    public void GetPuzzleArr_IgnoresCharactersTheEncodingDoesNotUse()
+    {
+        Assert.Equal(new int[] { 0, 1, 26 }, GetPuzzleArr("05a9z", EncodingOption.LettersOnly));
+        Assert.Equal(new int[] { 0, 5, 9 }, GetPuzzleArr("05a9z", EncodingOption.DigitsOnly));
+    }
 }

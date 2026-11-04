@@ -35,6 +35,8 @@ public static class SpecData
         WriteCreate(a_outDir);
         WriteShuffle(a_outDir);
         WriteSolve(a_outDir);
+        WriteEncode(a_outDir);
+        WriteDecode(a_outDir);
         return 0;
     }
 
@@ -133,5 +135,50 @@ public static class SpecData
             catch (Exception) { a_solution = null; }
             return (object)new { input = p_input, solution = a_solution };
         }));
+    }
+
+    // every value p_encoding can write: 0, then 1 up to the first value GetSymbol rejects
+    private static int[] Writable(in Utility.EncodingOption p_encoding)
+    {
+        List<int> a_values = [0];
+        try { while (true) { _ = Utility.GetSymbol(a_values.Count, p_encoding); a_values.Add(a_values.Count); } }
+        catch (ArgumentOutOfRangeException) { }
+        return [.. a_values];
+    }
+
+    // the values written as a code in each encoding, or null when GetPuzzleCode must throw
+    private static void WriteEncode(in string p_outDir)
+    {
+        int[] a_known = Utility.GetPuzzleArr(known), a_rank4 = [.. Sudoku.Create(4, 120, 777).Puzzle];
+        List<object> a_rows = [];
+        foreach (Utility.EncodingOption a_encoding in Enum.GetValues<Utility.EncodingOption>())
+        {
+            int[] a_writable = Writable(a_encoding);
+            int[][] a_cases = [a_writable, [.. a_writable, a_writable.Length], [0, -1, 0, 0], a_known, a_rank4];
+            foreach (int[] a_values in a_cases)
+            {
+                string? a_code;
+                try { a_code = Utility.GetPuzzleCode(a_values, a_encoding); }
+                catch (ArgumentOutOfRangeException) { a_code = null; }
+                a_rows.Add(new { encoding = a_encoding.ToString(), values = a_values, code = a_code });
+            }
+        }
+        Write(p_outDir, "encode.json", a_rows);
+    }
+
+    // each text read as a code in each encoding: every symbol in both cases, then characters some encodings don't use,
+    // including O, which the minus-O encodings skip, and non-ASCII letters that only case-fold to ASCII ones
+    private static void WriteDecode(in string p_outDir)
+    {
+        string[] a_texts =
+        [
+            "0123456789.ABCDEFGHIJKLMNOPQRSTUVWXYZ", "0123456789.abcdefghijklmnopqrstuvwxyz",
+            "05a9z", "NOP", "nop", "O0o", "1+0.2-", "[0.00", "ıſé", known,
+        ];
+        List<object> a_rows = [];
+        foreach (Utility.EncodingOption a_encoding in Enum.GetValues<Utility.EncodingOption>())
+            foreach (string a_text in a_texts)
+                a_rows.Add(new { encoding = a_encoding.ToString(), code = a_text, values = Utility.GetPuzzleArr(a_text, a_encoding) });
+        Write(p_outDir, "decode.json", a_rows);
     }
 }

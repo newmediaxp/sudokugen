@@ -6,7 +6,8 @@ using NMX.SudokuGen.Library.Core;
 using static NMX.SudokuGen.Library.Core.Utility;
 
 // checks the library against the shared test data in spec/tests, which every language's tests load:
-// the same seed must give the same random numbers, puzzles and shuffles in every language
+// the same seed must give the same random numbers, puzzles and shuffles in every language,
+// and every encoding must write and read the same puzzle codes
 public sealed class SpecDataTests
 {
     public sealed record RandomCase(int Seed, int[][] Calls)
@@ -29,6 +30,16 @@ public sealed class SpecDataTests
         public override string ToString() => Input;
     }
 
+    public sealed record EncodeCase(string Encoding, int[] Values, string? Code)
+    {
+        public override string ToString() => $"{Encoding} {Code ?? "throws"}";
+    }
+
+    public sealed record DecodeCase(string Encoding, string Code, int[] Values)
+    {
+        public override string ToString() => $"{Encoding} {Code}";
+    }
+
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
 
     // the csproj copies spec/tests next to the test assembly
@@ -39,6 +50,8 @@ public sealed class SpecDataTests
     public static TheoryData<CreateCase> CreateCases => new(Load<CreateCase>("create.json"));
     public static TheoryData<ShuffleCase> ShuffleCases => new(Load<ShuffleCase>("shuffle.json"));
     public static TheoryData<SolveCase> SolveCases => new(Load<SolveCase>("solve.json"));
+    public static TheoryData<EncodeCase> EncodeCases => new(Load<EncodeCase>("encode.json"));
+    public static TheoryData<DecodeCase> DecodeCases => new(Load<DecodeCase>("decode.json"));
 
     [Theory]
     [MemberData(nameof(RandomCases))]
@@ -78,4 +91,18 @@ public sealed class SpecDataTests
         if (p_case.Solution is null) Assert.Throws<InvalidOperationException>(() => Sudoku.Solve(a_puzz));
         else Assert.Equal(p_case.Solution, GetPuzzleCode(Sudoku.Solve(a_puzz).Solution));
     }
+
+    [Theory]
+    [MemberData(nameof(EncodeCases))]
+    public void GetPuzzleCode_GivesSpecCode_OrThrowsWhenNone(EncodeCase p_case)
+    {
+        EncodingOption a_encoding = Enum.Parse<EncodingOption>(p_case.Encoding);
+        if (p_case.Code is null) Assert.Throws<ArgumentOutOfRangeException>(() => GetPuzzleCode(p_case.Values, a_encoding));
+        else Assert.Equal(p_case.Code, GetPuzzleCode(p_case.Values, a_encoding));
+    }
+
+    [Theory]
+    [MemberData(nameof(DecodeCases))]
+    public void GetPuzzleArr_GivesSpecValues(DecodeCase p_case)
+        => Assert.Equal(p_case.Values, GetPuzzleArr(p_case.Code, Enum.Parse<EncodingOption>(p_case.Encoding)));
 }

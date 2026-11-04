@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { getPuzzleArr, getPuzzleCode } from "../src/index.ts";
+import { EncodingOption, getPuzzleArr, getPuzzleCode, getSymbol, maxRank } from "../src/index.ts";
 import { Random } from "../src/random.ts";
 import { count, initRandom, popCount } from "../src/utility.ts";
 
@@ -29,6 +29,90 @@ describe("puzzle codes", () => {
 
     it("parse letters case-insensitively", () => {
         assert.deepEqual(getPuzzleArr("AZaz"), [10, 35, 10, 35]);
+    });
+});
+
+describe("puzzle code encodings", () => {
+    // name, encoding, highest writable value, max rank, the code of [0, 1, max, 0]
+    const a_encodings = [
+        ["All", EncodingOption.All, 35, 5, "01.Z0"],
+        ["AllMinusO", EncodingOption.AllMinusO, 34, 5, "01.Z0"],
+        ["DigitsOnly", EncodingOption.DigitsOnly, 9, 3, "01.90"],
+        ["LettersOnly", EncodingOption.LettersOnly, 26, 5, "0A.Z0"],
+        ["LettersOnlyMinusO", EncodingOption.LettersOnlyMinusO, 25, 5, "0A.Z0"],
+    ] as const;
+
+    for (const [a_name, a_encoding, a_max, a_rank, a_code] of a_encodings) {
+        it(`${a_name} round-trips a rank ${a_rank} grid holding every value`, () => {
+            const a_rows = a_rank * a_rank;
+            const a_puzz = Array.from({ length: a_rows * a_rows }, (_, i) => i % (a_rows + 1));
+            assert.equal(new Set(a_puzz).size, a_rows + 1);
+            const a_puzzleCode = getPuzzleCode(a_puzz, a_encoding);
+            assert.equal(a_puzzleCode.length, a_rows * a_rows + a_rows - 1);
+            assert.deepEqual(getPuzzleArr(a_puzzleCode, a_encoding), a_puzz);
+            assert.deepEqual(getPuzzleArr(a_puzzleCode.toLowerCase(), a_encoding), a_puzz);
+        });
+
+        it(`${a_name} writes [0, 1, max, 0] as ${a_code} and throws above max`, () => {
+            assert.equal(getPuzzleCode([0, 1, a_max, 0], a_encoding), a_code);
+            assert.throws(() => getPuzzleCode([0, 1, a_max + 1, 0], a_encoding), RangeError);
+            assert.throws(() => getSymbol(a_max + 1, a_encoding), RangeError);
+            assert.throws(() => getSymbol(-1, a_encoding), RangeError);
+            assert.throws(() => getSymbol(1.5, a_encoding), RangeError);
+        });
+
+        it(`${a_name} writes blank as '0' and every value as a distinct symbol`, () => {
+            const a_symbols = Array.from({ length: a_max + 1 }, (_, i) => getSymbol(i, a_encoding));
+            assert.equal(a_symbols[0], "0");
+            assert.equal(new Set(a_symbols).size, a_max + 1);
+            assert.deepEqual(getPuzzleArr(a_symbols.join(""), a_encoding), [...a_symbols.keys()]);
+        });
+    }
+
+    for (const [a_name, a_encoding, a_max] of a_encodings.filter(([p_name]) => p_name.endsWith("MinusO")))
+        it(`${a_name} never writes O`, () => {
+            for (let i = 0; i <= a_max; ++i) assert.notEqual(getSymbol(i, a_encoding), "O");
+        });
+
+    it("minus-O encodings skip O and ignore it when parsing", () => {
+        assert.equal(getPuzzleCode([23, 24, 0, 0], EncodingOption.AllMinusO), "NP.00");
+        assert.equal(getPuzzleCode([14, 15, 0, 0], EncodingOption.LettersOnlyMinusO), "NP.00");
+        assert.deepEqual(getPuzzleArr("NOP", EncodingOption.AllMinusO), [23, 24]);
+        assert.deepEqual(getPuzzleArr("NOP", EncodingOption.LettersOnlyMinusO), [14, 15]);
+        assert.deepEqual(getPuzzleArr("nop", EncodingOption.LettersOnlyMinusO), [14, 15]);
+    });
+
+    it("parse only the characters the encoding uses", () => {
+        assert.deepEqual(getPuzzleArr("05a9z", EncodingOption.LettersOnly), [0, 1, 26]);
+        assert.deepEqual(getPuzzleArr("05a9z", EncodingOption.DigitsOnly), [0, 5, 9]);
+        // ASCII letters only: dotless i and long s are not I and S
+        assert.deepEqual(getPuzzleArr("ıſ", EncodingOption.All), []);
+    });
+
+    it("maxRank", () => {
+        assert.deepEqual(
+            a_encodings.map(([, a_encoding]) => maxRank(a_encoding)),
+            [5, 5, 3, 5, 5],
+        );
+        for (const [, a_encoding, , a_rank] of a_encodings) assert.equal(maxRank(a_encoding), a_rank);
+    });
+
+    it("no encoding means All", () => {
+        const a_puzz = Array.from({ length: 36 }, (_, i) => i);
+        assert.equal(getPuzzleCode(a_puzz), getPuzzleCode(a_puzz, EncodingOption.All));
+        assert.throws(() => getPuzzleCode([36, 0, 0, 0]), RangeError);
+        assert.throws(() => getPuzzleCode([-1, 0, 0, 0]), RangeError);
+        const a_code = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcxyz+.-";
+        assert.deepEqual(getPuzzleArr(a_code), getPuzzleArr(a_code, EncodingOption.All));
+        assert.deepEqual(getPuzzleArr("O0o"), [24, 0, 24]);
+    });
+
+    it("unknown encodings throw", () => {
+        const a_unknown = 5 as number as EncodingOption;
+        assert.throws(() => getSymbol(1, a_unknown), RangeError);
+        assert.throws(() => getPuzzleCode([0], a_unknown), RangeError);
+        assert.throws(() => getPuzzleArr("", a_unknown), RangeError);
+        assert.throws(() => maxRank(a_unknown), RangeError);
     });
 });
 

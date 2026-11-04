@@ -15,7 +15,8 @@ This file will hold the whole written spec:
 
 The `tests/` folder holds the test data every language's tests load. The C# library, the reference
 implementation, produced it through [NMX.SudokuGen.SpecData](../csharp/NMX.SudokuGen.SpecData).
-Grids are puzzle codes (one character per square, `0` = blank, `.` between rows).
+Grids are puzzle codes (one character per square, `0` = blank, `.` between rows), in the default `All` encoding,
+except `values`, which are arrays of square values.
 
 | File           | Each entry                                              | An implementation must                                                        |
 |----------------|---------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -23,6 +24,8 @@ Grids are puzzle codes (one character per square, `0` = blank, `.` between rows)
 | `create.json`  | `rank`, `blanks`, `seed`, `exhaustive`, `removed`, `puzzle`, `solution` | create exactly this `puzzle` and `solution`, with `removed` blanks, from these arguments. |
 | `shuffle.json` | `input`, `seed`, `puzzle`, `solution`                   | solve `input`, shuffle the result with `seed`, and get exactly this `puzzle` and `solution`. |
 | `solve.json`   | `input`, `solution`                                     | solve `input` to `solution`, or fail when `solution` is `null`.               |
+| `encode.json`  | `encoding`, `values`, `code`                            | write `values` in `encoding` (an `EncodingOption` name) as exactly `code`, or fail when `code` is `null`. |
+| `decode.json`  | `encoding`, `code`, `values`                            | read `code` in `encoding` as exactly `values`, skipping every character the encoding doesn't use. |
 
 Used by: the C# tests ([SpecDataTests.cs](../csharp/NMX.SudokuGen.Tests/Core/SpecDataTests.cs))
 and the JS tests ([spec.test.ts](../javascript/nmx.sudokugen.library/test/spec.test.ts)).

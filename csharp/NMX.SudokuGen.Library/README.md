@@ -2,7 +2,7 @@
 
 # Sudoku Gen Library
 
-`sudoku` `C#` `library` `dll`
+`sudoku` `csharp` `library` `dll`
 
 &copy; 2024-2026 New Media XP. Licensed under the [MIT License](https://github.com/newmediaxp/sudokugen/blob/main/LICENSE).  
 |
@@ -78,10 +78,28 @@ A square that is rule-clean but still wrong (`board[i] != Solution[i]`) returns 
 
 | Member          | Signature                                              | Description                                                                                                          |
 |-----------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| `GetPuzzleCode` | `static string GetPuzzleCode(IReadOnlyList<int> grid)` | Encodes a grid as a puzzle code: one char per square (`0` blank, `1`-`9`, `A` = 10…), `.` between rows.              |
+| `GetPuzzleCode` | `static string GetPuzzleCode(IReadOnlyList<int> grid)` | Encodes a grid as a puzzle code: one char per square (`0` blank, `1`-`9`, `A` = 10…), `.` between rows. Throws above 35 (`Z`). |
+| `GetPuzzleCode` | `static string GetPuzzleCode(IReadOnlyList<int> grid, EncodingOption encoding)` | Same, in the given encoding. Throws if a value doesn't fit it.                              |
 | `GetPuzzleArr`  | `static int[] GetPuzzleArr(string code)`               | Parses a puzzle code back into a grid array; unrecognised characters are ignored.                                    |
+| `GetPuzzleArr`  | `static int[] GetPuzzleArr(string code, EncodingOption encoding)` | Same, for a code in the given encoding. It can't be detected from the code, so pass the one it was written in. |
+| `GetSymbol`     | `static char GetSymbol(int value, EncodingOption encoding)` | The character one square value is written as.                                                                    |
+| `MaxRank`       | `static int MaxRank(EncodingOption encoding)`          | The highest rank the encoding can write.                                                                             |
 
 Also exposes general array/bit helpers used internally — `Copy`, `Same`, `Count`, `Swap2`, `Init`, `InitRandom`, `PopCount`.
+
+### `Utility.EncodingOption`
+
+Character sets for puzzle codes. Blank is `0` in every one. Letters read in either case.
+
+| Value               | Values written as                            | Max rank |
+|---------------------|----------------------------------------------|----------|
+| `All`               | `1`-`9`, then `A`-`Z` (`A` = 10). The default. | 5      |
+| `AllMinusO`         | `1`-`9`, then `A`-`Z` without `O`            | 5        |
+| `DigitsOnly`        | `1`-`9`                                      | 3        |
+| `LettersOnly`       | `A`-`Z` (`A` = 1)                            | 5        |
+| `LettersOnlyMinusO` | `A`-`Z` without `O` (`A` = 1)                | 5        |
+
+The minus-O sets skip `O` so it can't be misread as the blank `0`.
 
 ### Notes
 

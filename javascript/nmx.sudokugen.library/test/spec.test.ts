@@ -1,12 +1,13 @@
 // Copyright (c) 2024-2026 New Media XP. Licensed under the MIT License.
 
 // Checks this library against the shared test data in spec/tests, which the C# library (the reference) produced:
-// the same seed must give the same random numbers, puzzles and shuffles in every language.
+// the same seed must give the same random numbers, puzzles and shuffles in every language,
+// and every encoding must write and read the same puzzle codes.
 
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
-import { getPuzzleArr, getPuzzleCode, Sudoku } from "../src/index.ts";
+import { EncodingOption, getPuzzleArr, getPuzzleCode, Sudoku } from "../src/index.ts";
 import { Random } from "../src/random.ts";
 
 function load<T>(p_name: string): T[] {
@@ -56,5 +57,25 @@ describe("spec/tests", () => {
             if (a_case.solution === null) assert.throws(() => Sudoku.solve(a_puzz), Error, a_case.input);
             else assert.equal(getPuzzleCode(Sudoku.solve(a_puzz).solution), a_case.solution, a_case.input);
         }
+    });
+
+    type EncodingName = keyof typeof EncodingOption;
+
+    it("encode.json: every encoding writes the same codes and rejects the same values", () => {
+        for (const a_case of load<{ encoding: EncodingName; values: number[]; code: string | null }>("encode.json")) {
+            const a_encoding = EncodingOption[a_case.encoding];
+            const a_name = `${a_case.encoding} ${a_case.code ?? "throws"}`;
+            if (a_case.code === null) assert.throws(() => getPuzzleCode(a_case.values, a_encoding), RangeError, a_name);
+            else assert.equal(getPuzzleCode(a_case.values, a_encoding), a_case.code, a_name);
+        }
+    });
+
+    it("decode.json: every encoding reads the same values", () => {
+        for (const a_case of load<{ encoding: EncodingName; code: string; values: number[] }>("decode.json"))
+            assert.deepEqual(
+                getPuzzleArr(a_case.code, EncodingOption[a_case.encoding]),
+                a_case.values,
+                `${a_case.encoding} ${a_case.code}`,
+            );
     });
 });

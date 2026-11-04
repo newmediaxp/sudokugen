@@ -2,7 +2,7 @@
 
 # Sudoku Gen CLI
 
-`sudoku` `C#` `app` `cli`
+`sudoku` `csharp` `app` `cli`
 
 &copy; 2024-2026 New Media XP. Licensed under the [MIT License](https://github.com/newmediaxp/sudokugen/blob/main/LICENSE).  
 |
@@ -59,6 +59,7 @@ A bare launch with no arguments prints the usage info.
 | `-s` | seed for reproducible results              | { s \| s ∈ Z }                            | `create`, `shuffle`          |
 | `-i` | input from a file                          | a .txt file path                          |   `solve`, `shuffle`         |
 | `-o` | output to a file                           | a .txt file path                          | `create`, `solve`, `shuffle` |
+| `-e` | puzzle code encoding, for reading and writing | `all` (default), `all-no-o`, `digits`, `letters`, `letters-no-o` | `create`, `solve`, `shuffle` |
 
 ### Flags without value
 
@@ -78,6 +79,7 @@ sudokugen create
 sudokugen create -r 4 -b 120 -s 777
 sudokugen create -b max -exact
 sudokugen create -c 10 -o ./outputs.txt
+sudokugen create -r 4 -e letters-no-o
 sudokugen solve 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300
 sudokugen solve -i ./inputs.txt -o ./outputs.txt
 sudokugen shuffle 390560027.001809405.600172893.180257900.500643000.204081570.003096052.050328619.962010300 -s 777
@@ -85,6 +87,18 @@ sudokugen shuffle 390560027.001809405.600172893.180257900.500643000.204081570.00
 
 Puzzle code format: one character per square, row by row — `0` = blank,
 `1`-`9` as digits, `10`+ as letters (`A` = 10), `.` between rows.
+`-e` picks another character set; blank stays `0` in all of them:
+
+| Encoding       | Values written as                  | Max rank |
+|----------------|------------------------------------|----------|
+| `all`          | `1`-`9`, then `A`-`Z` (`A` = 10)   | 5        |
+| `all-no-o`     | `1`-`9`, then `A`-`Z` without `O`  | 5        |
+| `digits`       | `1`-`9`                            | 3        |
+| `letters`      | `A`-`Z` (`A` = 1)                  | 5        |
+| `letters-no-o` | `A`-`Z` without `O` (`A` = 1)      | 5        |
+
+The `-no-o` sets skip `O` so it can't be misread as the blank `0`. Letters read in either case.
+
 Exit code is 0 on success, 1 when any argument or puzzle failed; errors print to stderr.
 
 ---
