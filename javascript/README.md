@@ -1,6 +1,6 @@
-# Sudoku Gen JS
+# SudokuGen JS
 
-The JavaScript packages of Sudoku Gen, written in TypeScript, in one npm workspace.
+The JavaScript packages of SudokuGen, written in TypeScript, in one npm workspace.
 
 * [nmx.sudokugen.library](./nmx.sudokugen.library) — the JS library, published on
   [npm](https://www.npmjs.com/package/nmx.sudokugen.library)

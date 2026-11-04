@@ -1,6 +1,6 @@
-![Sudoku Gen](./icon.png)
+![SudokuGen](./icon.png)
 
-# Sudoku Gen
+# SudokuGen
 
 `sudoku` `csharp` `dotnet` `unity` `javascript` `typescript` `library` `cli`
 
@@ -15,7 +15,7 @@
 
 ## Description
 
-Sudoku Gen creates and solves sudoku puzzles, from rank 2 (4×4) up to rank 5 (25×25).
+SudokuGen creates and solves sudoku puzzles, from rank 2 (4×4) up to rank 5 (25×25).
 
 * Every created puzzle has exactly one solution.
 * A seed reproduces the same puzzle, in every language.
@@ -28,7 +28,7 @@ and they all follow the shared [spec](./spec).
 
 ## Used in
 
-* [Sudoku Gen web app](https://www.newmediaxp.com/app/sudokugen) — create, solve, play and share puzzles in the browser
+* [SudokuGen web app](https://www.newmediaxp.com/app/sudokugen) — create, solve, play and share puzzles in the browser
 * [Shaolin Sudoku](https://www.newmediaxp.com/blog/article/shaolin-sudoku) — a sudoku game, on itch.io and Game Jolt
 
 ---

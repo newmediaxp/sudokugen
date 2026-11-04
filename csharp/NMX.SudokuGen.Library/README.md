@@ -1,6 +1,6 @@
-![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+![SudokuGen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
 
-# Sudoku Gen Library
+# SudokuGen Library
 
 `sudoku` `csharp` `library` `dll`
 
@@ -118,7 +118,7 @@ The minus-O sets skip `O` so it can't be misread as the blank `0`.
 
 * Used in
 
-    * Sudoku Gen CLI [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Cli)
+    * SudokuGen CLI [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Cli)
     * Shaolin Sudoku [(link)](https://www.newmediaxp.com/blog/article/shaolin-sudoku)
 
 * Unity

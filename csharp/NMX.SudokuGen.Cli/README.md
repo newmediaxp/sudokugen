@@ -1,6 +1,6 @@
-![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+![SudokuGen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
 
-# Sudoku Gen CLI
+# SudokuGen CLI
 
 `sudoku` `csharp` `app` `cli`
 
@@ -110,7 +110,7 @@ Exit code is 0 on success, 1 when any argument or puzzle failed; errors print to
 * Dependencies
 
     * .Net 10.0
-    * Sudoku Gen Library [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Library)
+    * SudokuGen Library [(link)](https://www.nuget.org/packages/NMX.SudokuGen.Library)
 
 * Downloads
 

@@ -1,4 +1,4 @@
-# Sudoku Gen Spec
+# SudokuGen Spec
 
 The shared spec every language implementation follows. Not written yet.
 

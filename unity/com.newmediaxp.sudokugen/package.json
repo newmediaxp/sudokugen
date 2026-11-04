@@ -1,6 +1,6 @@
 {
   "name": "com.newmediaxp.sudokugen",
-  "displayName": "Sudoku Gen",
+  "displayName": "SudokuGen",
   "description": "Sudoku generator and solver: unique-solution puzzle creation (optionally seeded), solving, validation, conflict reporting and isomorphic shuffling. The C# library NMX.SudokuGen.Library as a prebuilt DLL.",
   "unity": "2021.2",
   "author": {

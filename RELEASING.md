@@ -1,6 +1,6 @@
 # Releasing
 
-How the Sudoku Gen packages get published. This is for maintainers; the package READMEs cover using them.
+How the SudokuGen packages get published. This is for maintainers; the package READMEs cover using them.
 
 ---
 
@@ -103,7 +103,8 @@ Every package's version is `major.minor.patch`.
     * `gitTagPrefix: csharp-v`, so it skips the `javascript-v` tags
     * `trackingMode: githubRelease`, so it publishes the attached `.tgz` instead of packing the tagged commit
       (which has no DLL)
-    * `githubReleaseAssetName: com.newmediaxp.sudokugen-`, to pick the `.tgz` out of the release's assets
+    * `githubReleaseAssetName: com.newmediaxp.sudokugen`, a filename prefix that picks the `.tgz` out of the
+      release's assets
     * `minVersion: 1.2.1`, since older csharp releases have no `.tgz`
 * `.meta` files: Unity needs one for every file and folder in a package, and can't make them inside an installed
   package, so they're committed. The root .gitignore ignores `*.meta` except under `unity/`. The DLL's, XML docs'

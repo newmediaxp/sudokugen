@@ -1,7 +1,7 @@
 {
     "name": "sudokugen-javascript",
     "private": true,
-    "description": "npm workspace holding the JS packages of Sudoku Gen",
+    "description": "npm workspace holding the JS packages of SudokuGen",
     "license": "MIT",
     "type": "module",
     "workspaces": [

@@ -1,6 +1,6 @@
-![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+![SudokuGen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
 
-# Sudoku Gen for Unity
+# SudokuGen for Unity
 
 `sudoku` `csharp` `unity` `library` `dll`
 
@@ -15,7 +15,7 @@
 
 ## Description
 
-The C# [Sudoku Gen library](https://www.nuget.org/packages/NMX.SudokuGen.Library) as a Unity package. It creates and
+The C# [SudokuGen library](https://www.nuget.org/packages/NMX.SudokuGen.Library) as a Unity package. It creates and
 solves sudoku puzzles, from rank 2 (4×4) up to rank 5 (25×25).
 
 * Every created puzzle has exactly one solution.

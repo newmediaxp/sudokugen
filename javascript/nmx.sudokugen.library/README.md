@@ -1,6 +1,6 @@
-![Sudoku Gen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
+![SudokuGen](https://raw.githubusercontent.com/newmediaxp/sudokugen/main/icon.png)
 
-# Sudoku Gen Library
+# SudokuGen Library
 
 `sudoku` `javascript` `typescript` `library` `npm`
 
@@ -159,7 +159,7 @@ const a_grid    = getPuzzleArr(a_letters, EncodingOption.LettersOnly);       // 
 
 * Used in
 
-    * Sudoku Gen web app [(link)](https://www.newmediaxp.com/app/sudokugen)
+    * SudokuGen web app [(link)](https://www.newmediaxp.com/app/sudokugen)
 
 * Other languages
 

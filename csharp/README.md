@@ -1,6 +1,6 @@
-# Sudoku Gen C#
+# SudokuGen C#
 
-The C# projects of Sudoku Gen, in one Visual Studio solution ([NMX.SudokuGen.Library.sln](./NMX.SudokuGen.Library.sln)).
+The C# projects of SudokuGen, in one Visual Studio solution ([NMX.SudokuGen.Library.sln](./NMX.SudokuGen.Library.sln)).
 
 * [NMX.SudokuGen.Library](./NMX.SudokuGen.Library) — the C# library (`netstandard2.1`), published on
   [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library)
