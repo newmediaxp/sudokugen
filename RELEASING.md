@@ -58,7 +58,7 @@ Every package's version is `major.minor.patch`.
       [NuGet](https://www.nuget.org/packages/NMX.SudokuGen.Library). The trusted publishing policy belongs to
       the NuGet user NewMediaXP. After the push it attaches `SudokuGenLib-netstandard2.1.zip` (the DLL, its XML
       docs and the license) to the release, for setups without NuGet such as Unity's `Assets/Plugins`. Then it
-      attaches the Unity package `com.newmediaxp.sudokugen-<version>.tgz` (see [unity](#unity)).
+      signs the Unity package and attaches it as `com.newmediaxp.sudokugen-<version>.tgz` (see [unity](#unity)).
     * `cli-aot` builds Native AOT binaries of the CLI for 7 platforms, attaches them to the release, and packs
       each platform's tool package on that platform (Native AOT can't cross-compile between operating systems).
     * `publish-cli-tool` runs once all 7 succeed. It packs the framework-dependent `any` fallback and the
@@ -95,9 +95,19 @@ Every package's version is `major.minor.patch`.
   It ships with every csharp release, so it has no tag or version of its own.
 * Version: its package.json has none. `publish-nuget` writes the library's `<Version>` in when it packs, and fails
   that step if the tag isn't `csharp-v<that version>`.
-* Release: `publish-nuget` copies in the DLL, its XML docs and the license, runs `npm pack` in the package folder and
-  attaches the `.tgz` to the release. OpenUPM watches the repo's `csharp-v` tags and publishes the `.tgz` from the
-  matching release unchanged, usually within half an hour. Nothing needs doing on OpenUPM per release.
+* Release: `publish-nuget` copies in the DLL, its XML docs and the license, packs and signs the package folder with
+  Unity's UPM CLI (`upm pack`) and attaches the `.tgz` to the release. OpenUPM watches the repo's `csharp-v` tags
+  and publishes the `.tgz` from the matching release unchanged, usually within half an hour. Nothing needs doing
+  on OpenUPM per release. A manual run of `publish.yml` signs the package too and keeps the `.tgz` as a workflow
+  artifact, for testing the signing without a release.
+* Signing: Unity 6.3+ flags packages without a signature. The signature is `package/.attestation.p7m` inside the
+  `.tgz`, which the job checks for. Anything that changes the `.tgz`'s contents after `upm pack` breaks it.
+  Versions up to 1.2.2 are unsigned.
+    * Signer: a Unity Cloud service account in the Unity organization, with the organization role
+      Package Manager Package Signer (in the Package Manager field of Manage organization roles).
+    * Credentials: the `newmediaxp` GitHub organization's Actions secrets `UPM_SERVICE_ACCOUNT_KEY_ID`,
+      `UPM_SERVICE_ACCOUNT_KEY_SECRET` (the service account's key) and `UPM_ORG_ID` (the Unity organization ID),
+      with repository access limited to selected repositories.
 * OpenUPM's settings are in `data/packages/com.newmediaxp.sudokugen.yml` in the
   [openupm repo](https://github.com/openupm/openupm), changed by pull request there:
     * `gitTagPrefix: csharp-v`, so it skips the `javascript-v` tags

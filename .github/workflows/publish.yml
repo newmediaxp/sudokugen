@@ -3,7 +3,8 @@ name: publish
 # On a published GitHub Release whose tag starts with csharp-v (e.g. csharp-v1.2.0):
 #  - publishes NMX.SudokuGen.Library to NuGet.org (Trusted Publishing / OIDC, no stored key)
 #  - attaches the library DLL, its XML docs and the license to the release as a zip
-#  - attaches the Unity package com.newmediaxp.sudokugen as a .tgz, which OpenUPM publishes from the release
+#  - signs the Unity package com.newmediaxp.sudokugen and attaches it as a .tgz, which OpenUPM publishes
+#    from the release
 #  - builds Native AOT executables of the CLI for each platform and attaches them to the release
 #  - publishes the CLI to NuGet.org as the .NET tool NMX.SudokuGen.Cli (command sudokugen):
 #    one Native AOT package per platform, a framework-dependent fallback and the pointer package
@@ -12,7 +13,8 @@ name: publish
 #  - publishes nmx.sudokugen.library to npm (Trusted Publishing / OIDC, with provenance)
 #  Bump "version" in javascript/nmx.sudokugen.library/package.json and commit before creating the release.
 # The languages share this repo, so every job checks the tag prefix. A manual run (workflow_dispatch)
-# runs every job; the registries skip versions they already have.
+# runs every job; the registries skip versions they already have, and the signed Unity .tgz is kept as a
+# workflow artifact instead of attached to a release.
 # NuGet's and npm's trusted publishing settings name this file: update them before renaming it.
 # The release steps are in RELEASING.md.
 on:
@@ -69,22 +71,52 @@ jobs:
           gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
 
       # OpenUPM watches the csharp-v tags and publishes this .tgz from the release unchanged
-      # (trackingMode: githubRelease); it needs the package.json version to match the tag
-      - name: Attach the Unity package to release
-        if: github.event_name == 'release'
+      # (trackingMode: githubRelease); it needs the package.json version to match the tag.
+      # upm pack signs it for Unity 6.3+ with a Unity service account (role Package Manager Package Signer),
+      # from the newmediaxp GitHub org secrets UPM_*; nothing may change the .tgz's contents after it
+      - name: Install the Unity UPM CLI
+        run: |
+          curl -fsSL https://cdn.packages.unity.com/upm-cli/install.sh | bash
+          echo "$HOME/.upm/bin" >> "$GITHUB_PATH"
+
+      - name: Sign the Unity package
         env:
-          GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
+          UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
+          UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
         run: |
           lib=csharp/NMX.SudokuGen.Library/bin/Release/netstandard2.1
           pkg=unity/com.newmediaxp.sudokugen
           version=$(dotnet msbuild csharp/NMX.SudokuGen.Library -getProperty:Version)
-          if [ "$TAG" != "csharp-v$version" ]; then echo "::error::tag $TAG doesn't match the library version $version"; exit 1; fi
+          if [ -n "$TAG" ] && [ "$TAG" != "csharp-v$version" ]; then echo "::error::tag $TAG doesn't match the library version $version"; exit 1; fi
           cp "$lib/SudokuGenLib.dll" "$lib/SudokuGenLib.xml" "$pkg/Runtime/"
           cp LICENSE "$pkg/LICENSE.md"
-          mkdir -p dist
-          (cd "$pkg" && npm pkg set version="$version" && npm pack --pack-destination "$GITHUB_WORKSPACE/dist")
-          gh release upload "$TAG" "dist/com.newmediaxp.sudokugen-$version.tgz" --clobber
+          (cd "$pkg" && npm pkg set version="$version")
+          upm pack "$pkg" --organization-id "$UPM_ORG_ID" --destination "$RUNNER_TEMP/upm"
+          # renaming the file keeps the signature, which is inside it; the name is what OpenUPM's
+          # githubReleaseAssetName prefix matches
+          tgz="unity-dist/com.newmediaxp.sudokugen-$version.tgz"
+          mkdir -p unity-dist
+          mv "$RUNNER_TEMP"/upm/*.tgz "$tgz"
+          tar -tzf "$tgz" | grep -qx 'package/.attestation.p7m' || { echo "::error::$tgz isn't signed"; exit 1; }
+          tar -tzf "$tgz" | grep -qx 'package/Runtime/SudokuGenLib.dll' || { echo "::error::$tgz has no SudokuGenLib.dll"; exit 1; }
+          echo "UNITY_TGZ=$tgz" >> "$GITHUB_ENV"
+
+      - name: Attach the Unity package to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "$UNITY_TGZ" --clobber
+
+      # a manual run tests the signing without a release
+      - name: Upload the Unity package as a workflow artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: com.newmediaxp.sudokugen
+          path: unity-dist/*.tgz
+          if-no-files-found: error
 
   publish-npm:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'javascript-v')
